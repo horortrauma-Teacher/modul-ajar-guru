@@ -299,7 +299,7 @@ export default function ModulGenApp() {
     setGenState('C'); setIsGenerating(true); setActiveDocType(docType);
 
     // ⚠️ MASUKKAN API KEY GEMINI LO DI BAWAH INI:
-    const apiKey = "AQ.Ab8RN6KAPNeUfSsEW3xQCIC-6QBxvbzOcIOB7QPTYOVd01bdWQ"; 
+    const apiKey = "process.env.NEXT_PUBLIC_GEMINI_API_KEY"; 
 
     try {
       if(!apiKey) {
