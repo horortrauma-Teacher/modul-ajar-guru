@@ -1,0 +1,40 @@
+@import "tailwindcss";
+
+@theme {
+  --color-background: #0a0f1c;
+  --color-surface: #1a2333;
+  --color-surface_border: #2d3748;
+  /* Tema Biru (Brand) */
+  --color-brand-400: #60a5fa;
+  --color-brand-500: #3b82f6;
+  --color-brand-600: #2563eb;
+  /* Tema Oranye (Accent) */
+  --color-accent-400: #fb923c;
+  --color-accent-500: #f97316;
+  --color-accent-600: #ea580c;
+}
+
+/* Animasi Fade */
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.animate-fade { animation: fadeIn 0.4s ease-out forwards; }
+
+/* Custom Scrollbar */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: #0a0f1c; }
+::-webkit-scrollbar-thumb { background: #2d3748; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #4a5568; }
+
+/* Gaya Kertas Putih Hasil Generate */
+#generatedContent {
+    background-color: white; padding: 2rem 3rem; border-radius: 4px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    font-family: "Times New Roman", Times, serif; line-height: 1.5; color: black; max-width: 800px; margin: 0 auto;
+}
+#generatedContent h1 { font-size: 24px; font-weight: bold; margin-bottom: 16px; text-align: center; color: black; }
+#generatedContent h2 { font-size: 20px; font-weight: bold; margin-top: 24px; margin-bottom: 12px; border-bottom: 1px solid #ccc; padding-bottom: 4px; color: black;}
+#generatedContent h3 { font-size: 16px; font-weight: bold; margin-top: 16px; margin-bottom: 8px; color: black;}
+#generatedContent p, #generatedContent li { margin-bottom: 12px; color: black;}
+#generatedContent ul, #generatedContent ol { margin-left: 24px; margin-bottom: 12px; color: black;}
+#generatedContent table { width: 100%; border-collapse: collapse; margin-bottom: 16px; color: black;}
+#generatedContent table, #generatedContent th, #generatedContent td { border: 1px solid black; }
+#generatedContent th, #generatedContent td { padding: 8px; text-align: left; }
+#generatedContent table.signature-table, #generatedContent table.signature-table th, #generatedContent table.signature-table td { border: none !important; text-align: center; padding: 4px; }
