@@ -523,7 +523,7 @@ DATA ASESMEN:
 - Jenis: ${ujianData.jenisAsesmen} ${ujianData.jenisAsesmen === 'Pilihan Ganda' ? `(${ujianData.jumlahOpsi}, ${ujianData.tipePG})` : ''}
 - Taksonomi / Kesulitan: ${ujianData.taksonomi} / ${ujianData.kesulitan}
 - Jumlah: ${ujianData.jumlahSoal} Butir Soal.
-
+INSTRUKSI WAJIB: Buat soal HANYA berdasarkan Indikator di atas. DILARANG membuat soal umum/melenceng.
 ATURAN MUTLAK (ANTI-HALU & ANTI-LATEX):
 1. Output HANYA tag HTML (<div>, <table>, <ol>, <h3>, dll). Dilarang menyertakan teks sebelum/sesudah HTML.
 2. Jika tipe "Soal Literasi", wajib berikan stimulus (teks/data) di setiap soal.
@@ -989,6 +989,7 @@ STRUKTUR HTML YANG WAJIB DIIKUTI:
                       <input required className="w-full bg-background border border-surface_border rounded-lg p-3 text-white outline-none focus:border-amber-500" value={ujianData.topik} onChange={e => setUjianData({...ujianData, topik: e.target.value})} />
                     </div>
                   </div>
+                
 
                   {/* --- INTEGRASI TOMBOL CP UNTUK SOAL --- */}
                   <div className="bg-background border border-surface_border rounded-xl p-4">
