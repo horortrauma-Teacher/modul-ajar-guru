@@ -194,11 +194,11 @@ export default function ModulGenApp() {
     }
   };
   const [formData, setFormData] = useState({
-    guru: 'Heru Arranuri', sekolah: 'SMPS Daar el-qolam', kepsek: 'Ahmad Taufik',
-    jenjang: 'SMP/MTs', kelas: 'Kelas 8', fase: 'Fase D', semester: 'Semester 1 (Ganjil)',
+    guru: '', sekolah: '', kepsek: '',
+    jenjang: '', kelas: '', fase: '', semester: '',
     mapel: '', cp: '',
-    topik: 'Berpikir Komputasional', karakteristik: 'Siswa reguler, gaya belajar visual dan kinestetik.',
-    pertemuan: '2', jp: '2 x 45 menit', model: 'Problem Based Learning (PBL)'
+    topik: '', karakteristik: '',
+    pertemuan: '', jp: '', model: ''
   });
   const [selectedP5, setSelectedP5] = useState<string[]>(["Bernalar kritis", "Kreatif"]);
 
