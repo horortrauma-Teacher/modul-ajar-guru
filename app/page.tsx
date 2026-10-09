@@ -108,9 +108,12 @@ export default function ModulGenApp() {
   // LOGIKA AUTO-FILL CP UNTUK SEMUA FORM (MODUL, LKPD, SOAL)
   // ========================================================
   
+  // Menggunakan tipe any untuk JSON database agar tidak error saat dibaca oleh TypeScript
+  const dbAsAny = cpDatabase as any;
+  
   // 1. Logika CP Modul Ajar
   const namaFase = formData.fase?.includes('Fase') ? formData.fase : `Fase ${formData.fase}`;
-  const daftarTopikTersedia = (cpDatabase as any)[namaFase]?.[formData.mapel] || [];
+  const daftarTopikTersedia = dbAsAny[namaFase]?.[formData.mapel] || [];
   const handleTopikChange = (e: any) => {
     const selectedElemen = e.target.value;
     const dataCpDitemukan = daftarTopikTersedia.find((item: any) => item.elemen === selectedElemen);
@@ -119,7 +122,7 @@ export default function ModulGenApp() {
 
   // 2. Logika CP LKPD
   const namaFaseLkpd = lkpdData.fase?.includes('Fase') ? lkpdData.fase : `Fase ${lkpdData.fase}`;
-  const daftarTopikLkpd = (cpDatabase as any)[namaFaseLkpd]?.[lkpdData.mapel] || [];
+  const daftarTopikLkpd = dbAsAny[namaFaseLkpd]?.[lkpdData.mapel] || [];
   const handleTopikLkpdChange = (e: any) => {
     const selectedElemen = e.target.value;
     const dataCpDitemukan = daftarTopikLkpd.find((item: any) => item.elemen === selectedElemen);
@@ -128,7 +131,7 @@ export default function ModulGenApp() {
 
   // 3. Logika CP Ujian/Soal
   const namaFaseUjian = ujianData.fase?.includes('Fase') ? ujianData.fase : `Fase ${ujianData.fase}`;
-  const daftarTopikUjian = (cpDatabase as any)[namaFaseUjian]?.[ujianData.mapel] || [];
+  const daftarTopikUjian = dbAsAny[namaFaseUjian]?.[ujianData.mapel] || [];
   const handleTopikUjianChange = (e: any) => {
     const selectedElemen = e.target.value;
     const dataCpDitemukan = daftarTopikUjian.find((item: any) => item.elemen === selectedElemen);
@@ -158,13 +161,13 @@ export default function ModulGenApp() {
       return showSystemModal("Validasi Gagal", "Silakan pilih Mata Pelajaran terlebih dahulu sebelum mencari CP.");
     }
 
-    const dbSubjectKey = Object.keys(cpDatabase).find(key =>
+    const dbSubjectKey = Object.keys(dbAsAny).find(key =>
       currentMapel.toLowerCase().includes(key.toLowerCase()) ||
       key.toLowerCase().includes(currentMapel.toLowerCase())
     );
 
-    if (dbSubjectKey && cpDatabase[dbSubjectKey][currentFase]) {
-      setAvailableCps(cpDatabase[dbSubjectKey][currentFase]);
+    if (dbSubjectKey && dbAsAny[dbSubjectKey][currentFase]) {
+      setAvailableCps(dbAsAny[dbSubjectKey][currentFase]);
     } else {
       setAvailableCps([
         { id: 'ELEMEN 1', title: 'Pemahaman Konsep Inti', desc: `Pada akhir ${currentFase}, peserta didik mampu memahami konsep dasar, prinsip, dan teori terkait materi ${currentMapel} secara komprehensif.` },
