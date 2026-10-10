@@ -20,6 +20,7 @@ export default function ModulGenApp() {
   const p5Options = ["Beriman & Bertaqwa", "Berkebinekaan global", "Bergotong royong", "Mandiri", "Bernalar kritis", "Kreatif"];
 
   const mataPelajaranOptions = [
+    "PAUD (Tematik/Umum)",
     "Pendidikan Agama Islam dan Budi Pekerti",
     "Pendidikan Agama Kristen dan Budi Pekerti",
     "Pendidikan Agama Katolik dan Budi Pekerti",
@@ -87,7 +88,6 @@ export default function ModulGenApp() {
 
   const [selectedP5, setSelectedP5] = useState<string[]>(["Bernalar kritis", "Kreatif"]);
   
-  // Update state LKPD agar mencakup jenjang dan fase
   const [lkpdData, setLkpdData] = useState({ jenjang: '', kelas: '', fase: '', mapel: '', topik: '', cp: '' });
   
   const [ujianData, setUjianData] = useState({
@@ -105,37 +105,99 @@ export default function ModulGenApp() {
   const [availableCps, setAvailableCps] = useState<any[]>([]);
 
   // ========================================================
-  // LOGIKA AUTO-FILL CP UNTUK SEMUA FORM (MODUL, LKPD, SOAL)
+  // LOGIKA AUTO-FILL CP CERDAS (FUZZY MATCHING)
   // ========================================================
-  
-  // Menggunakan tipe any untuk JSON database agar tidak error saat dibaca oleh TypeScript
   const dbAsAny = cpDatabase as any;
   
-  // 1. Logika CP Modul Ajar
-  const namaFase = formData.fase?.includes('Fase') ? formData.fase : `Fase ${formData.fase}`;
-  const daftarTopikTersedia = dbAsAny[namaFase]?.[formData.mapel] || [];
+  const getTopikByFaseAndMapel = (fase: string, mapel: string) => {
+    if (!fase || !mapel) return [];
+    const namaFase = fase.includes('Fase') ? fase : `Fase ${fase}`;
+    const faseData = dbAsAny[namaFase];
+    if (!faseData) return [];
+
+    // Jika user pilih PAUD, paksa ke key "PAUD" di database JSON
+    if (mapel.includes("PAUD") && faseData["PAUD"]) return faseData["PAUD"];
+
+    // Fuzzy matching untuk nama Mapel yang aneh di dokumen (misal: "1. SENI MUSIK" vs "Seni Musik")
+    const dbSubjectKey = Object.keys(faseData).find(key =>
+      mapel.toLowerCase().includes(key.toLowerCase()) ||
+      key.toLowerCase().includes(mapel.toLowerCase())
+    );
+    return dbSubjectKey ? faseData[dbSubjectKey] : [];
+  };
+
+  const daftarTopikTersedia = getTopikByFaseAndMapel(formData.fase, formData.mapel);
   const handleTopikChange = (e: any) => {
     const selectedElemen = e.target.value;
     const dataCpDitemukan = daftarTopikTersedia.find((item: any) => item.elemen === selectedElemen);
     setFormData((prev: any) => ({ ...prev, topik: selectedElemen, cp: dataCpDitemukan ? dataCpDitemukan.deskripsi : '' }));
   };
 
-  // 2. Logika CP LKPD
-  const namaFaseLkpd = lkpdData.fase?.includes('Fase') ? lkpdData.fase : `Fase ${lkpdData.fase}`;
-  const daftarTopikLkpd = dbAsAny[namaFaseLkpd]?.[lkpdData.mapel] || [];
+  const daftarTopikLkpd = getTopikByFaseAndMapel(lkpdData.fase, lkpdData.mapel);
   const handleTopikLkpdChange = (e: any) => {
     const selectedElemen = e.target.value;
     const dataCpDitemukan = daftarTopikLkpd.find((item: any) => item.elemen === selectedElemen);
     setLkpdData((prev: any) => ({ ...prev, topik: selectedElemen, cp: dataCpDitemukan ? dataCpDitemukan.deskripsi : '' }));
   };
 
-  // 3. Logika CP Ujian/Soal
-  const namaFaseUjian = ujianData.fase?.includes('Fase') ? ujianData.fase : `Fase ${ujianData.fase}`;
-  const daftarTopikUjian = dbAsAny[namaFaseUjian]?.[ujianData.mapel] || [];
+  const daftarTopikUjian = getTopikByFaseAndMapel(ujianData.fase, ujianData.mapel);
   const handleTopikUjianChange = (e: any) => {
     const selectedElemen = e.target.value;
     const dataCpDitemukan = daftarTopikUjian.find((item: any) => item.elemen === selectedElemen);
     setUjianData((prev: any) => ({ ...prev, topik: selectedElemen, indikator: dataCpDitemukan ? dataCpDitemukan.deskripsi : '' }));
+  };
+
+  const openCpModal = (target: 'modul' | 'ujian') => {
+    setActiveCpTarget(target);
+    setTempSelectedCp([]);
+    const currentMapel = target === 'modul' ? formData.mapel : ujianData.mapel;
+    const currentFase = target === 'modul' ? formData.fase : ujianData.fase;
+
+    if (!currentMapel || !currentFase) {
+      return showSystemModal("Validasi Gagal", "Silakan pilih Fase/Kelas dan Mata Pelajaran terlebih dahulu sebelum mencari CP.");
+    }
+
+    const namaFase = currentFase.includes('Fase') ? currentFase : `Fase ${currentFase}`;
+    const faseData = dbAsAny[namaFase];
+
+    if (faseData) {
+      let dbSubjectKey = Object.keys(faseData).find(key =>
+        currentMapel.toLowerCase().includes(key.toLowerCase()) ||
+        key.toLowerCase().includes(currentMapel.toLowerCase())
+      );
+      
+      if (currentMapel.includes("PAUD") && faseData["PAUD"]) dbSubjectKey = "PAUD";
+
+      if (dbSubjectKey) {
+        setAvailableCps(faseData[dbSubjectKey]);
+        setShowCpModal(true);
+        return;
+      }
+    }
+
+    setAvailableCps([
+      { elemen: 'Pemahaman Konsep Inti', deskripsi: `Pada akhir ${currentFase}, peserta didik mampu memahami konsep dasar, prinsip, dan teori terkait materi ${currentMapel} secara komprehensif.` },
+      { elemen: 'Keterampilan Proses & Aplikasi', deskripsi: `Pada akhir ${currentFase}, peserta didik mampu menerapkan prinsip-prinsip ${currentMapel} untuk menganalisis dan memecahkan masalah kontekstual dalam kehidupan sehari-hari.` }
+    ]);
+    setShowCpModal(true);
+  };
+
+  const handleToggleCp = (descText: string) => {
+    if (tempSelectedCp.includes(descText)) {
+      setTempSelectedCp(tempSelectedCp.filter(item => item !== descText));
+    } else {
+      setTempSelectedCp([...tempSelectedCp, descText]);
+    }
+  };
+
+  const applyCpSelection = () => {
+    const joinedCp = tempSelectedCp.join('\n\n');
+    if (activeCpTarget === 'modul') {
+      setFormData({ ...formData, cp: joinedCp });
+    } else {
+      setUjianData({ ...ujianData, indikator: joinedCp });
+    }
+    setShowCpModal(false);
   };
   // ========================================================
 
@@ -150,50 +212,6 @@ export default function ModulGenApp() {
 
   const showSystemModal = (title: string, message: string) => setModal({ isOpen: true, title, message });
   const switchTab = (tab: string) => { setActiveTab(tab); setGenState('A'); window.scrollTo({ top: 0, behavior: 'smooth' }); if (tab === 'brankas') ambilDataBrankas(); };
-
-  const openCpModal = (target: 'modul' | 'ujian') => {
-    setActiveCpTarget(target);
-    setTempSelectedCp([]);
-    const currentMapel = target === 'modul' ? formData.mapel : ujianData.mapel;
-    const currentFase = target === 'modul' ? formData.fase : ujianData.fase;
-
-    if (!currentMapel) {
-      return showSystemModal("Validasi Gagal", "Silakan pilih Mata Pelajaran terlebih dahulu sebelum mencari CP.");
-    }
-
-    const dbSubjectKey = Object.keys(dbAsAny).find(key =>
-      currentMapel.toLowerCase().includes(key.toLowerCase()) ||
-      key.toLowerCase().includes(currentMapel.toLowerCase())
-    );
-
-    if (dbSubjectKey && dbAsAny[dbSubjectKey][currentFase]) {
-      setAvailableCps(dbAsAny[dbSubjectKey][currentFase]);
-    } else {
-      setAvailableCps([
-        { id: 'ELEMEN 1', title: 'Pemahaman Konsep Inti', desc: `Pada akhir ${currentFase}, peserta didik mampu memahami konsep dasar, prinsip, dan teori terkait materi ${currentMapel} secara komprehensif.` },
-        { id: 'ELEMEN 2', title: 'Keterampilan Proses & Aplikasi', desc: `Pada akhir ${currentFase}, peserta didik mampu menerapkan prinsip-prinsip ${currentMapel} untuk menganalisis dan memecahkan masalah kontekstual dalam kehidupan sehari-hari.` }
-      ]);
-    }
-    setShowCpModal(true);
-  };
-
-  const handleToggleCp = (desc: string) => {
-    if (tempSelectedCp.includes(desc)) {
-      setTempSelectedCp(tempSelectedCp.filter(item => item !== desc));
-    } else {
-      setTempSelectedCp([...tempSelectedCp, desc]);
-    }
-  };
-
-  const applyCpSelection = () => {
-    const joinedCp = tempSelectedCp.join('\n\n');
-    if (activeCpTarget === 'modul') {
-      setFormData({ ...formData, cp: joinedCp });
-    } else {
-      setUjianData({ ...ujianData, indikator: joinedCp });
-    }
-    setShowCpModal(false);
-  };
 
   const ambilDataBrankas = async () => {
     if (!currentUser || !currentUser.email) return;
@@ -667,7 +685,7 @@ STRUKTUR HTML YANG WAJIB DIIKUTI:
                   </div>
                   <div className="grid grid-cols-2 gap-5">
                     <div><label className="text-xs text-slate-400">Jenjang</label><select required className="w-full bg-background border border-surface_border rounded-lg px-4 py-3 mt-1" value={formData.jenjang} onChange={e => setFormData({ ...formData, jenjang: e.target.value, kelas: '' })}><option value="">Pilih...</option>{Object.keys(kelasByJenjang).map(j => <option key={j} value={j}>{j}</option>)}</select></div>
-                    <div><label className="text-xs text-slate-400">Kelas</label><select required disabled={!formData.jenjang} className="w-full bg-background border border-surface_border rounded-lg px-4 py-3 mt-1" value={formData.kelas} onChange={e => setFormData({ ...formData, kelas: e.target.value, fase: faseByKelas[e.target.value] })}><option value="">Pilih...</option>{formData.jenjang && kelasByJenjang[formData.jenjang].map((k: string) => <option key={k} value={k}>{k}</option>)}</select></div>
+                    <div><label className="text-xs text-slate-400">Kelas / Fase</label><select required disabled={!formData.jenjang} className="w-full bg-background border border-surface_border rounded-lg px-4 py-3 mt-1" value={formData.kelas} onChange={e => setFormData({ ...formData, kelas: e.target.value, fase: faseByKelas[e.target.value] })}><option value="">Pilih...</option>{formData.jenjang && kelasByJenjang[formData.jenjang].map((k: string) => <option key={k} value={k}>{k}</option>)}</select></div>
                   </div>
                   <div className="grid grid-cols-2 gap-5">
                     <div>
@@ -771,9 +789,7 @@ STRUKTUR HTML YANG WAJIB DIIKUTI:
               <div className="bg-surface border border-surface_border rounded-3xl p-6 sm:p-10 shadow-2xl mt-6">
                 <h2 className="text-2xl font-bold text-white mb-6 border-b border-surface_border pb-4">Data LKPD</h2>
                 
-                {/* --- PERUBAHAN LKPD: Form sekarang pakai Jenjang dan Dropdown Topik CP --- */}
                 <form onSubmit={handleGenerateLKPD} className="space-y-6">
-                  
                   <div className="grid grid-cols-2 gap-5">
                     <div>
                       <label className="text-xs text-slate-400">Jenjang</label>
@@ -905,7 +921,6 @@ STRUKTUR HTML YANG WAJIB DIIKUTI:
                       </select>
                     </div>
                     
-                    {/* --- PERUBAHAN SOAL: Form sekarang pakai Dropdown Topik CP --- */}
                     <div>
                       <label className="block text-xs font-semibold text-slate-400 mb-2">5. Topik Spesifik (Elemen CP)</label>
                       <select required className="w-full bg-background border border-surface_border rounded-lg p-3 text-white outline-none focus:border-amber-500" value={ujianData.topik} onChange={handleTopikUjianChange}>
@@ -1032,12 +1047,14 @@ STRUKTUR HTML YANG WAJIB DIIKUTI:
               <button onClick={() => setShowCpModal(false)} className="text-emerald-200 hover:text-white p-1"><svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg></button>
             </div>
             <div className="p-5 overflow-y-auto flex-1 bg-slate-50 space-y-3">
-              {availableCps.map((cp) => {
-                const isChecked = tempSelectedCp.includes(cp.desc);
+              {availableCps.map((cp: any, idx: number) => {
+                const title = cp.elemen || cp.title;
+                const desc = cp.deskripsi || cp.desc;
+                const isChecked = tempSelectedCp.includes(desc);
                 return (
-                  <label key={cp.id} className={`flex items-start gap-4 p-4 rounded-lg border-2 cursor-pointer transition-colors ${isChecked ? 'border-emerald-500 bg-emerald-50' : 'border-slate-200 bg-white hover:border-emerald-300'}`}>
-                    <div className="mt-0.5"><input type="checkbox" className="w-5 h-5 text-emerald-600 rounded focus:ring-emerald-500" checked={isChecked} onChange={() => handleToggleCp(cp.desc)} /></div>
-                    <div><h4 className="font-bold text-slate-800">{cp.title}</h4><p className="text-sm text-slate-600 mt-1">{cp.desc}</p></div>
+                  <label key={idx} className={`flex items-start gap-4 p-4 rounded-lg border-2 cursor-pointer transition-colors ${isChecked ? 'border-emerald-500 bg-emerald-50' : 'border-slate-200 bg-white hover:border-emerald-300'}`}>
+                    <div className="mt-0.5"><input type="checkbox" className="w-5 h-5 text-emerald-600 rounded focus:ring-emerald-500" checked={isChecked} onChange={() => handleToggleCp(desc)} /></div>
+                    <div><h4 className="font-bold text-slate-800">{title}</h4><p className="text-sm text-slate-600 mt-1 whitespace-pre-wrap">{desc}</p></div>
                   </label>
                 );
               })}
@@ -1064,49 +1081,13 @@ STRUKTUR HTML YANG WAJIB DIIKUTI:
             <p className="text-slate-300 text-sm mb-6" dangerouslySetInnerHTML={{ __html: modal.message }}></p>
             <div className="flex justify-end"><button onClick={() => setModal({ ...modal, isOpen: false })} className="bg-brand-600 hover:bg-brand-500 text-white font-semibold py-2 px-6 rounded-lg">Tutup</button></div>
           </div>
-          {activeTab === 'brankas' && (
-            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-12">
-              <div className="bg-surface border border-surface_border rounded-3xl p-6 sm:p-10 shadow-2xl mt-6">
-                <h2 className="text-2xl font-bold text-white mb-6 border-b border-surface_border pb-4">
-                  Brankas Dokumen Saya
-                </h2>
-
-                {daftarDokumen.length === 0 ? (
-                  <div className="text-center py-16 bg-background rounded-2xl border border-surface_border border-dashed">
-                    <p className="text-slate-400 text-lg">Brankas masih kosong.</p>
-                    <p className="text-slate-500 text-sm mt-2">Modul yang Anda buat akan otomatis tersimpan di sini.</p>
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                    {daftarDokumen.map((dok) => (
-                      <div key={dok.id} className="bg-background border border-surface_border p-5 rounded-xl flex flex-col justify-between hover:border-brand-500 transition-colors">
-                        <div>
-                          <span className="text-xs font-bold bg-brand-900/40 text-brand-500 px-3 py-1 rounded-full mb-3 inline-block">
-                            {dok.doc_type}
-                          </span>
-                          <h3 className="text-white font-bold text-lg mb-2 line-clamp-2">{dok.title}</h3>
-                          <p className="text-xs text-slate-400 mb-4">
-                            Dibuat: {new Date(dok.created_at).toLocaleDateString('id-ID')}
-                          </p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-
         </div>
       )}
+      
       {/* TAMPILAN BRANKAS DOKUMEN FINAL */}
       {activeTab === 'brankas' && (
         <section className="relative animate-fade max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 -mt-8 md:-mt-12 pb-20 z-0">
-
-          {/* Elemen Dekorasi Latar Belakang (Cahaya Oren di belakang judul) */}
           <div className="absolute top-10 left-1/2 -translate-x-1/2 w-full max-w-2xl h-[200px] bg-orange-500/15 blur-[100px] rounded-full pointer-events-none -z-10"></div>
-
-          {/* Bagian Header Brankas */}
           <div className="text-center mb-10 relative z-10">
             <div className="inline-block px-4 py-1.5 bg-orange-500/10 text-orange-400 text-sm font-semibold rounded-full mb-4 border border-orange-500/20 shadow-[0_0_15px_rgba(249,115,22,0.15)]">
               <i className="fa-solid fa-box-archive mr-2"></i> Riwayat Penyimpanan
@@ -1120,7 +1101,6 @@ STRUKTUR HTML YANG WAJIB DIIKUTI:
             </p>
           </div>
 
-          {/* Kontainer Utama Kotak Dokumen */}
           <div className="bg-slate-800/40 backdrop-blur-md border border-slate-700/50 rounded-3xl p-6 sm:p-10 shadow-2xl relative z-10">
             <div className="flex justify-between items-center mb-8 border-b border-slate-700/50 pb-4">
               <h3 className="text-lg font-semibold text-white">Daftar Dokumen <span className="text-slate-400 text-sm font-normal">({daftarDokumen.length} Total)</span></h3>
@@ -1170,36 +1150,14 @@ STRUKTUR HTML YANG WAJIB DIIKUTI:
       {selectedContent && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 md:p-8 animate-fade">
           <div className="bg-white text-black w-full max-w-5xl h-full max-h-[90vh] rounded-2xl flex flex-col overflow-hidden shadow-2xl">
-            {/* Header Pop-up */}
             <div className="p-4 border-b flex justify-between items-center bg-slate-100">
               <h3 className="font-bold text-lg text-slate-800">Pratinjau Dokumen</h3>
-
-              {/* Kumpulan Tombol Export */}
               <div className="flex gap-3">
-                <button
-                  onClick={exportToPDF}
-                  className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg font-bold transition-colors flex items-center gap-2 text-sm"
-                >
-                  <i className="fa-solid fa-file-pdf"></i> Download PDF
-                </button>
-
-                <button
-                  onClick={exportToWord}
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-bold transition-colors flex items-center gap-2 text-sm"
-                >
-                  <i className="fa-solid fa-file-word"></i> Download Doc
-                </button>
-
-                <button
-                  onClick={() => setSelectedContent(null)}
-                  className="bg-red-500 hover:bg-red-600 text-white px-5 py-2 rounded-lg font-bold transition-colors text-sm"
-                >
-                  Tutup
-                </button>
+                <button onClick={exportToPDF} className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg font-bold transition-colors flex items-center gap-2 text-sm"><i className="fa-solid fa-file-pdf"></i> Download PDF</button>
+                <button onClick={exportToWord} className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-bold transition-colors flex items-center gap-2 text-sm"><i className="fa-solid fa-file-word"></i> Download Doc</button>
+                <button onClick={() => setSelectedContent(null)} className="bg-red-500 hover:bg-red-600 text-white px-5 py-2 rounded-lg font-bold transition-colors text-sm">Tutup</button>
               </div>
             </div>
-
-            {/* Isi Teks Modul HTML */}
             <div className="p-8 overflow-y-auto flex-1 font-sans">
               <div dangerouslySetInnerHTML={{ __html: selectedContent }} />
             </div>
