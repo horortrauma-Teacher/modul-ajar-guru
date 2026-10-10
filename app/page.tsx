@@ -679,24 +679,24 @@ STRUKTUR HTML YANG WAJIB DIIKUTI:
                 <form onSubmit={handleGenerateModul} className="space-y-6">
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-5 p-5 bg-brand-900/20 border border-brand-500/20 rounded-xl">
-                    <div><label className="text-xs text-slate-300">Nama Guru</label><input required className="w-full bg-background border border-surface_border rounded-lg px-3 py-2.5 mt-1" value={formData.guru} onChange={e => setFormData({ ...formData, guru: e.target.value })} /></div>
-                    <div><label className="text-xs text-slate-300">Sekolah</label><input required className="w-full bg-background border border-surface_border rounded-lg px-3 py-2.5 mt-1" value={formData.sekolah} onChange={e => setFormData({ ...formData, sekolah: e.target.value })} /></div>
-                    <div><label className="text-xs text-slate-300">Kepala Sekolah</label><input required className="w-full bg-background border border-surface_border rounded-lg px-3 py-2.5 mt-1" value={formData.kepsek} onChange={e => setFormData({ ...formData, kepsek: e.target.value })} /></div>
+                    <div><label className="text-xs text-slate-300">Nama Guru Penyusun <span className="text-red-500">*</span></label><input required placeholder="Nama Lengkap dengan Gelar" className="w-full bg-background border border-surface_border rounded-lg px-3 py-2.5 mt-1 placeholder-slate-500" value={formData.guru} onChange={e => setFormData({ ...formData, guru: e.target.value })} /></div>
+                    <div><label className="text-xs text-slate-300">Sekolah <span className="text-red-500">*</span></label><input required placeholder="Contoh: SMP Negeri 1 Jakarta" className="w-full bg-background border border-surface_border rounded-lg px-3 py-2.5 mt-1 placeholder-slate-500" value={formData.sekolah} onChange={e => setFormData({ ...formData, sekolah: e.target.value })} /></div>
+                    <div><label className="text-xs text-slate-300">Kepala Sekolah</label><input placeholder="Nama Kepala Sekolah dengan Gelar" className="w-full bg-background border border-surface_border rounded-lg px-3 py-2.5 mt-1 placeholder-slate-500" value={formData.kepsek} onChange={e => setFormData({ ...formData, kepsek: e.target.value })} /></div>
                   </div>
                   <div className="grid grid-cols-2 gap-5">
-                    <div><label className="text-xs text-slate-400">Jenjang</label><select required className="w-full bg-background border border-surface_border rounded-lg px-4 py-3 mt-1" value={formData.jenjang} onChange={e => setFormData({ ...formData, jenjang: e.target.value, kelas: '' })}><option value="">Pilih...</option>{Object.keys(kelasByJenjang).map(j => <option key={j} value={j}>{j}</option>)}</select></div>
-                    <div><label className="text-xs text-slate-400">Kelas / Fase</label><select required disabled={!formData.jenjang} className="w-full bg-background border border-surface_border rounded-lg px-4 py-3 mt-1" value={formData.kelas} onChange={e => setFormData({ ...formData, kelas: e.target.value, fase: faseByKelas[e.target.value] })}><option value="">Pilih...</option>{formData.jenjang && kelasByJenjang[formData.jenjang].map((k: string) => <option key={k} value={k}>{k}</option>)}</select></div>
+                    <div><label className="text-xs text-slate-400">Satuan Pendidikan <span className="text-red-500">*</span></label><select required className="w-full bg-background border border-surface_border rounded-lg px-4 py-3 mt-1" value={formData.jenjang} onChange={e => setFormData({ ...formData, jenjang: e.target.value, kelas: '' })}><option value="">Pilih...</option>{Object.keys(kelasByJenjang).map(j => <option key={j} value={j}>{j}</option>)}</select></div>
+                    <div><label className="text-xs text-slate-400">Kelas / Fase <span className="text-red-500">*</span></label><select required disabled={!formData.jenjang} className="w-full bg-background border border-surface_border rounded-lg px-4 py-3 mt-1" value={formData.kelas} onChange={e => setFormData({ ...formData, kelas: e.target.value, fase: faseByKelas[e.target.value] })}><option value="">Pilih...</option>{formData.jenjang && kelasByJenjang[formData.jenjang].map((k: string) => <option key={k} value={k}>{k}</option>)}</select></div>
                   </div>
                   <div className="grid grid-cols-2 gap-5">
                     <div>
-                      <label className="text-xs text-slate-400">Mata Pelajaran</label>
+                      <label className="text-xs text-slate-400">Mata Pelajaran <span className="text-red-500">*</span></label>
                       <select required className="w-full bg-background border border-surface_border rounded-lg px-4 py-3 mt-1 outline-none focus:border-brand-500 text-white" value={formData.mapel} onChange={e => setFormData({ ...formData, mapel: e.target.value })}>
                         <option value="" disabled>Pilih Mata Pelajaran...</option>
                         {mataPelajaranOptions.map(m => <option key={m} value={m}>{m}</option>)}
                       </select>
                     </div>
                     <div>
-                      <label className="text-xs text-slate-400">Topik Spesifik (Elemen CP)</label>
+                      <label className="text-xs text-slate-400">Topik Spesifik (Elemen CP) <span className="text-red-500">*</span></label>
                       <select
                         required
                         className="w-full bg-background border border-brand-500 rounded-lg px-4 py-3 mt-1 outline-none text-white focus:border-brand-500 ring-1 ring-brand-500"
@@ -722,7 +722,7 @@ STRUKTUR HTML YANG WAJIB DIIKUTI:
                     </div>
 
                     <div className="col-span-2">
-                      <label className="block text-xs font-medium text-slate-400 mb-2">Profil Pelajar Pancasila <span className="text-[10px] text-slate-500">(maks 3)</span></label>
+                      <label className="block text-xs font-medium text-slate-400 mb-2">Profil Pelajar Pancasila <span className="text-[10px] text-slate-500">(maks 3)</span> <span className="text-red-500">*</span></label>
                       <div className="flex flex-wrap gap-2">
                         {p5Options.map(opt => (
                           <div key={opt} onClick={() => { if (selectedP5.includes(opt)) setSelectedP5(selectedP5.filter(i => i !== opt)); else if (selectedP5.length < 3) setSelectedP5([...selectedP5, opt]); }} className={`cursor-pointer px-3 py-1.5 rounded-full border text-xs font-medium ${selectedP5.includes(opt) ? 'bg-brand-500 text-white border-brand-600' : 'bg-background text-slate-300 border-surface_border'}`}>{opt}</div>
@@ -730,9 +730,13 @@ STRUKTUR HTML YANG WAJIB DIIKUTI:
                       </div>
                     </div>
                     <div className="grid grid-cols-3 gap-5 col-span-2">
-                      <div><label className="text-xs text-slate-400">Pertemuan</label><input required type="number" className="w-full bg-background border border-surface_border rounded-lg px-4 py-3 mt-1" value={formData.pertemuan} onChange={e => setFormData({ ...formData, pertemuan: e.target.value })} /></div>
-                      <div><label className="text-xs text-slate-400">JP/Pertemuan</label><input required className="w-full bg-background border border-surface_border rounded-lg px-4 py-3 mt-1" value={formData.jp} onChange={e => setFormData({ ...formData, jp: e.target.value })} /></div>
-                      <div><label className="text-xs text-slate-400">Model Pembelajaran</label><select required className="w-full bg-background border border-surface_border rounded-lg px-4 py-3 mt-1" value={formData.model} onChange={e => setFormData({ ...formData, model: e.target.value })}><option value="Problem Based Learning (PBL)">PBL</option><option value="Project Based Learning (PjBL)">PjBL</option><option value="Discovery Learning">Discovery</option></select></div>
+                      <div><label className="text-xs text-slate-400">Pertemuan <span className="text-red-500">*</span></label><input required type="number" placeholder="Contoh: 2" className="w-full bg-background border border-surface_border rounded-lg px-4 py-3 mt-1 placeholder-slate-500" value={formData.pertemuan} onChange={e => setFormData({ ...formData, pertemuan: e.target.value })} /></div>
+                      <div><label className="text-xs text-slate-400">JP/Pertemuan <span className="text-red-500">*</span></label><input required placeholder="Contoh: 2 JP" className="w-full bg-background border border-surface_border rounded-lg px-4 py-3 mt-1 placeholder-slate-500" value={formData.jp} onChange={e => setFormData({ ...formData, jp: e.target.value })} /></div>
+                      <div><label className="text-xs text-slate-400">Model Pembelajaran <span className="text-red-500">*</span></label><select required className="w-full bg-background border border-surface_border rounded-lg px-4 py-3 mt-1" value={formData.model} onChange={e => setFormData({ ...formData, model: e.target.value })}><option value="Problem Based Learning (PBL)">PBL</option><option value="Project Based Learning (PjBL)">PjBL</option><option value="Discovery Learning">Discovery</option></select></div>
+                    </div>
+                    <div className="col-span-2">
+                      <label className="block text-xs font-medium text-slate-400 mb-2">Target/Karakteristik Peserta Didik</label>
+                      <input placeholder="Contoh: Peserta didik reguler, tidak ada kesulitan belajar." className="w-full bg-background border border-surface_border rounded-lg px-4 py-3 mt-1 placeholder-slate-500" value={formData.karakteristik} onChange={e => setFormData({ ...formData, karakteristik: e.target.value })} />
                     </div>
                     <div className="pt-6 col-span-2">
                       <button type="submit" disabled={isGenerating} className="w-full bg-gradient-to-r from-orange-600 to-orange-500 text-white font-bold py-4 rounded-lg shadow-md transition-all">
@@ -792,14 +796,14 @@ STRUKTUR HTML YANG WAJIB DIIKUTI:
                 <form onSubmit={handleGenerateLKPD} className="space-y-6">
                   <div className="grid grid-cols-2 gap-5">
                     <div>
-                      <label className="text-xs text-slate-400">Jenjang</label>
+                      <label className="text-xs text-slate-400">Satuan Pendidikan <span className="text-red-500">*</span></label>
                       <select required className="w-full bg-background border border-surface_border text-white rounded-lg px-4 py-3 mt-1 outline-none focus:border-brand-500" value={lkpdData.jenjang} onChange={e => setLkpdData({ ...lkpdData, jenjang: e.target.value, kelas: '' })}>
                         <option value="" disabled>Pilih...</option>
                         {Object.keys(kelasByJenjang).map(j => <option key={j} value={j}>{j}</option>)}
                       </select>
                     </div>
                     <div>
-                      <label className="text-xs text-slate-400">Kelas / Fase</label>
+                      <label className="text-xs text-slate-400">Kelas / Fase <span className="text-red-500">*</span></label>
                       <select required disabled={!lkpdData.jenjang} className="w-full bg-background border border-surface_border text-white rounded-lg px-4 py-3 mt-1 outline-none focus:border-brand-500" value={lkpdData.kelas} onChange={e => setLkpdData({ ...lkpdData, kelas: e.target.value, fase: faseByKelas[e.target.value] })}>
                         <option value="" disabled>Pilih...</option>
                         {lkpdData.jenjang && kelasByJenjang[lkpdData.jenjang].map((k: string) => <option key={k} value={k}>{k}</option>)}
@@ -809,14 +813,14 @@ STRUKTUR HTML YANG WAJIB DIIKUTI:
 
                   <div className="grid grid-cols-2 gap-5">
                     <div>
-                      <label className="text-xs text-slate-400">Mata Pelajaran</label>
+                      <label className="text-xs text-slate-400">Mata Pelajaran <span className="text-red-500">*</span></label>
                       <select required className="w-full bg-background border border-surface_border text-white rounded-lg px-4 py-3 mt-1 outline-none focus:border-brand-500" value={lkpdData.mapel} onChange={e => setLkpdData({ ...lkpdData, mapel: e.target.value })}>
                         <option value="" disabled>Pilih Mata Pelajaran...</option>
                         {mataPelajaranOptions.map(m => <option key={m} value={m}>{m}</option>)}
                       </select>
                     </div>
                     <div>
-                      <label className="text-xs text-slate-400">Topik Praktikum (Elemen CP)</label>
+                      <label className="text-xs text-slate-400">Topik Praktikum (Elemen CP) <span className="text-red-500">*</span></label>
                       <select required className="w-full bg-background border border-brand-500 text-white rounded-lg px-4 py-3 mt-1 outline-none ring-1 ring-brand-500 focus:border-brand-500" value={lkpdData.topik} onChange={handleTopikLkpdChange}>
                         <option value="" disabled>Pilih Topik / Elemen...</option>
                         {daftarTopikLkpd.map((item: any, index: number) => <option key={index} value={item.elemen}>{item.elemen}</option>)}
@@ -826,7 +830,7 @@ STRUKTUR HTML YANG WAJIB DIIKUTI:
                   
                   <div className="bg-background border border-surface_border rounded-xl p-4">
                       <label className="text-xs text-slate-400 font-semibold mb-2 block">Capaian Pembelajaran (Otomatis)</label>
-                      <textarea required rows={4} className="w-full bg-surface border border-surface_border rounded-lg px-4 py-3 outline-none text-sm text-slate-300" value={lkpdData.cp} onChange={e => setLkpdData({ ...lkpdData, cp: e.target.value })} placeholder="CP akan terisi otomatis saat topik dipilih..."></textarea>
+                      <textarea required rows={4} className="w-full bg-surface border border-surface_border rounded-lg px-4 py-3 outline-none text-sm text-slate-300 placeholder-slate-500" value={lkpdData.cp} onChange={e => setLkpdData({ ...lkpdData, cp: e.target.value })} placeholder="CP akan terisi otomatis saat topik dipilih..."></textarea>
                   </div>
 
                   <div className="pt-6"><button type="submit" disabled={isGenerating} className="w-full bg-gradient-to-r from-emerald-600 to-emerald-500 text-white font-bold py-4 rounded-lg shadow-md">{isGenerating ? 'MEMPROSES LKPD...' : 'GENERATE LKPD SEKARANG'}</button></div>
@@ -883,14 +887,14 @@ STRUKTUR HTML YANG WAJIB DIIKUTI:
                 <form onSubmit={handleGenerateUjianPro} className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-xs font-semibold text-slate-400 mb-2">1. Jenjang Pendidikan</label>
+                      <label className="block text-xs font-semibold text-slate-400 mb-2">1. Satuan Pendidikan <span className="text-red-500">*</span></label>
                       <select required className="w-full bg-background border border-surface_border rounded-lg p-3 text-white outline-none focus:border-amber-500" value={ujianData.jenjang} onChange={handleJenjangChange}>
                         <option value="" disabled>Pilih...</option>
                         {Object.keys(kelasByJenjang).map(j => <option key={j} value={j}>{j}</option>)}
                       </select>
                     </div>
                     <div>
-                      <label className="block text-xs font-semibold text-slate-400 mb-2">2. Kelas</label>
+                      <label className="block text-xs font-semibold text-slate-400 mb-2">2. Kelas <span className="text-red-500">*</span></label>
                       <select required disabled={!ujianData.jenjang} className="w-full bg-background border border-surface_border rounded-lg p-3 text-white outline-none focus:border-amber-500" value={ujianData.kelas} onChange={handleKelasChange}>
                         <option value="" disabled>Pilih...</option>
                         {ujianData.jenjang && kelasByJenjang[ujianData.jenjang]?.map((k: string) => <option key={k} value={k}>{k}</option>)}
@@ -904,7 +908,7 @@ STRUKTUR HTML YANG WAJIB DIIKUTI:
                       <input readOnly className="w-full bg-slate-900 border border-surface_border rounded-lg p-3 text-slate-500 cursor-not-allowed" value={ujianData.fase} />
                     </div>
                     <div>
-                      <label className="block text-xs font-semibold text-slate-400 mb-2">3. Semester</label>
+                      <label className="block text-xs font-semibold text-slate-400 mb-2">3. Semester <span className="text-red-500">*</span></label>
                       <select required className="w-full bg-background border border-surface_border rounded-lg p-3 text-white outline-none focus:border-amber-500" value={ujianData.semester} onChange={e => setUjianData({ ...ujianData, semester: e.target.value })}>
                         <option value="Semester 1">Semester 1 (Ganjil)</option>
                         <option value="Semester 2">Semester 2 (Genap)</option>
@@ -914,7 +918,7 @@ STRUKTUR HTML YANG WAJIB DIIKUTI:
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-xs font-semibold text-slate-400 mb-2">4. Mata Pelajaran</label>
+                      <label className="block text-xs font-semibold text-slate-400 mb-2">4. Mata Pelajaran <span className="text-red-500">*</span></label>
                       <select required className="w-full bg-background border border-surface_border rounded-lg p-3 text-white outline-none focus:border-amber-500" value={ujianData.mapel} onChange={e => setUjianData({ ...ujianData, mapel: e.target.value })}>
                         <option value="" disabled>Pilih Mata Pelajaran...</option>
                         {mataPelajaranOptions.map(m => <option key={m} value={m}>{m}</option>)}
@@ -922,7 +926,7 @@ STRUKTUR HTML YANG WAJIB DIIKUTI:
                     </div>
                     
                     <div>
-                      <label className="block text-xs font-semibold text-slate-400 mb-2">5. Topik Spesifik (Elemen CP)</label>
+                      <label className="block text-xs font-semibold text-slate-400 mb-2">5. Topik Spesifik (Elemen CP) <span className="text-red-500">*</span></label>
                       <select required className="w-full bg-background border border-surface_border rounded-lg p-3 text-white outline-none focus:border-amber-500" value={ujianData.topik} onChange={handleTopikUjianChange}>
                         <option value="" disabled>Pilih Topik / Elemen...</option>
                         {daftarTopikUjian.map((item: any, index: number) => <option key={index} value={item.elemen}>{item.elemen}</option>)}
@@ -936,19 +940,19 @@ STRUKTUR HTML YANG WAJIB DIIKUTI:
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
                       Lihat & Pilih Alternatif CP
                     </button>
-                    <textarea required rows={4} placeholder="Indikator akan terisi otomatis saat topik dipilih..." className="w-full bg-surface border border-surface_border rounded-lg px-4 py-3 outline-none text-sm text-slate-300" value={ujianData.indikator} onChange={e => setUjianData({ ...ujianData, indikator: e.target.value })}></textarea>
+                    <textarea required rows={4} placeholder="Indikator akan terisi otomatis saat topik dipilih..." className="w-full bg-surface border border-surface_border rounded-lg px-4 py-3 outline-none text-sm text-slate-300 placeholder-slate-500" value={ujianData.indikator} onChange={e => setUjianData({ ...ujianData, indikator: e.target.value })}></textarea>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-5 bg-background border border-surface_border rounded-xl">
                     <div>
-                      <label className="block text-xs font-semibold text-slate-400 mb-3">7. Tipe Stimulus Soal</label>
+                      <label className="block text-xs font-semibold text-slate-400 mb-3">7. Tipe Stimulus Soal <span className="text-red-500">*</span></label>
                       <select className="w-full bg-surface border border-surface_border rounded-lg p-3 text-white outline-none focus:border-amber-500" value={ujianData.tipeSoal} onChange={e => setUjianData({ ...ujianData, tipeSoal: e.target.value })}>
                         <option value="Soal Umum (Langsung)">Soal Umum (Kasus Singkat)</option>
                         <option value="Soal Literasi">Soal Literasi (Teks Panjang/Data)</option>
                       </select>
                     </div>
                     <div>
-                      <label className="block text-xs font-semibold text-slate-400 mb-3">8. Bentuk Asesmen</label>
+                      <label className="block text-xs font-semibold text-slate-400 mb-3">8. Bentuk Asesmen <span className="text-red-500">*</span></label>
                       <select className="w-full bg-surface border border-surface_border rounded-lg p-3 text-white outline-none focus:border-amber-500" value={ujianData.jenisAsesmen} onChange={e => setUjianData({ ...ujianData, jenisAsesmen: e.target.value })}>
                         <option value="Pilihan Ganda">Pilihan Ganda</option>
                         <option value="Isian Singkat">Isian Singkat</option>
@@ -960,14 +964,14 @@ STRUKTUR HTML YANG WAJIB DIIKUTI:
                   {ujianData.jenisAsesmen === 'Pilihan Ganda' && (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-amber-500/10 border border-amber-500/20 rounded-lg animate-fade">
                       <div>
-                        <label className="block text-[11px] font-semibold text-amber-200 mb-1">Jumlah Opsi</label>
+                        <label className="block text-[11px] font-semibold text-amber-200 mb-1">Jumlah Opsi <span className="text-red-500">*</span></label>
                         <select className="w-full bg-background border border-amber-500/30 rounded p-2 text-sm text-white outline-none" value={ujianData.jumlahOpsi} onChange={e => setUjianData({ ...ujianData, jumlahOpsi: e.target.value })}>
                           <option value="4 Opsi (A, B, C, D)">4 Opsi (A, B, C, D)</option>
                           <option value="5 Opsi (A, B, C, D, E)">5 Opsi (A, B, C, D, E)</option>
                         </select>
                       </div>
                       <div>
-                        <label className="block text-[11px] font-semibold text-amber-200 mb-1">Tipe PG</label>
+                        <label className="block text-[11px] font-semibold text-amber-200 mb-1">Tipe PG <span className="text-red-500">*</span></label>
                         <select className="w-full bg-background border border-amber-500/30 rounded p-2 text-sm text-white outline-none" value={ujianData.tipePG} onChange={e => setUjianData({ ...ujianData, tipePG: e.target.value })}>
                           <option value="PG Tunggal (1 Benar)">PG Tunggal (1 Benar)</option>
                           <option value="PG Kompleks (Lebih dari 1 Benar)">PG Kompleks</option>
@@ -978,21 +982,21 @@ STRUKTUR HTML YANG WAJIB DIIKUTI:
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                     <div>
-                      <label className="block text-xs font-semibold text-slate-400 mb-2">9. Taksonomi</label>
+                      <label className="block text-xs font-semibold text-slate-400 mb-2">9. Taksonomi <span className="text-red-500">*</span></label>
                       <select className="w-full bg-background border border-surface_border rounded-lg p-3 text-white outline-none focus:border-amber-500" value={ujianData.taksonomi} onChange={e => setUjianData({ ...ujianData, taksonomi: e.target.value })}>
                         <option value="Taksonomi Bloom">Bloom</option>
                         <option value="Taksonomi SOLO">SOLO</option>
                       </select>
                     </div>
                     <div>
-                      <label className="block text-xs font-semibold text-slate-400 mb-2">10. Tingkat Kesulitan</label>
+                      <label className="block text-xs font-semibold text-slate-400 mb-2">10. Tingkat Kesulitan <span className="text-red-500">*</span></label>
                       <select className="w-full bg-background border border-surface_border rounded-lg p-3 text-white outline-none focus:border-amber-500" value={ujianData.kesulitan} onChange={e => setUjianData({ ...ujianData, kesulitan: e.target.value })}>
                         <option value="HOTS (High Order)">HOTS Saja</option>
                         <option value="Kombinasi (LOTS+MOTS+HOTS)">Kombinasi</option>
                       </select>
                     </div>
                     <div>
-                      <label className="block text-xs font-semibold text-slate-400 mb-2">11. Jml Soal (Max 20)</label>
+                      <label className="block text-xs font-semibold text-slate-400 mb-2">11. Jml Soal (Max 20) <span className="text-red-500">*</span></label>
                       <input type="number" min="1" max="20" required className="w-full bg-background border border-surface_border rounded-lg p-3 text-white outline-none focus:border-amber-500" value={ujianData.jumlahSoal} onChange={e => setUjianData({ ...ujianData, jumlahSoal: Number(e.target.value) })} />
                     </div>
                   </div>
