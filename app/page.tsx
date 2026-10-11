@@ -17,7 +17,17 @@ export default function ModulGenApp() {
     'Kelas 7': 'Fase D', 'Kelas 8': 'Fase D', 'Kelas 9': 'Fase D', 'Kelas 10': 'Fase E',
     'Kelas 11': 'Fase F', 'Kelas 12': 'Fase F'
   };
-  const p5Options = ["Beriman & Bertaqwa", "Berkebinekaan global", "Bergotong royong", "Mandiri", "Bernalar kritis", "Kreatif"];
+  
+  const dplOptions = [
+    "Keimanan dan Ketakwaan terhadap Tuhan YME", "Kewargaan", "Penalaran Kritis", "Kreativitas", 
+    "Kolaborasi", "Kemandirian", "Kesehatan", "Komunikasi"
+  ];
+  
+  const metodePembelajaranOptions = [
+    "Diskusi Kelas", "Diskusi Kelompok", "Presentasi", "Tanya Jawab", 
+    "Demonstrasi", "Penugasan", "Permainan", "Role Playing", 
+    "Mind Mapping", "Studi Kasus", "Window Shopping"
+  ];
 
   const mataPelajaranOptions = [
     "PAUD (Tematik/Umum)",
@@ -68,7 +78,7 @@ export default function ModulGenApp() {
   const [formData, setFormData] = useState({
     guru: '', sekolah: '', kepsek: '',
     jenjang: '', kelas: '', fase: '', semester: '',
-    mapel: '', cp: '',
+    mapel: '', cp: '', tp: '', 
     topik: '', karakteristik: '',
     pertemuan: '', jp: '', model: ''
   });
@@ -86,7 +96,8 @@ export default function ModulGenApp() {
   const [resultHtml, setResultHtml] = useState("");
   const [activeDocType, setActiveDocType] = useState("Modul");
 
-  const [selectedP5, setSelectedP5] = useState<string[]>(["Bernalar kritis", "Kreatif"]);
+  const [selectedDPL, setSelectedDPL] = useState<string[]>([]);
+  const [selectedMetode, setSelectedMetode] = useState<string[]>([]); 
   
   const [lkpdData, setLkpdData] = useState({ jenjang: '', kelas: '', fase: '', mapel: '', topik: '', cp: '' });
   
@@ -105,20 +116,31 @@ export default function ModulGenApp() {
   const [availableCps, setAvailableCps] = useState<any[]>([]);
 
   // ========================================================
-  // LOGIKA AUTO-FILL CP CERDAS (FUZZY MATCHING)
+  // LOGIKA AUTO-FILL CP CERDAS (DARI JSON VERSI TERBARU)
   // ========================================================
   const dbAsAny = cpDatabase as any;
   
+  const handleMapelChange = (e: any, target: 'modul' | 'lkpd' | 'ujian') => {
+    const selectedMapel = e.target.value;
+    const tujuanObj = dbAsAny.Tujuan?.[selectedMapel] || '';
+    
+    if (target === 'modul') {
+      setFormData(prev => ({ ...prev, mapel: selectedMapel, tp: tujuanObj, topik: '', cp: '' }));
+    } else if (target === 'lkpd') {
+      setLkpdData(prev => ({ ...prev, mapel: selectedMapel, topik: '', cp: '' }));
+    } else {
+      setUjianData(prev => ({ ...prev, mapel: selectedMapel, topik: '', indikator: '' }));
+    }
+  };
+
   const getTopikByFaseAndMapel = (fase: string, mapel: string) => {
-    if (!fase || !mapel) return [];
+    if (!fase || !mapel || !dbAsAny.Fase) return [];
     const namaFase = fase.includes('Fase') ? fase : `Fase ${fase}`;
-    const faseData = dbAsAny[namaFase];
+    const faseData = dbAsAny.Fase[namaFase];
     if (!faseData) return [];
 
-    // Jika user pilih PAUD, paksa ke key "PAUD" di database JSON
-    if (mapel.includes("PAUD") && faseData["PAUD"]) return faseData["PAUD"];
+    if (mapel.includes("PAUD") && faseData["PAUD (Tematik/Umum)"]) return faseData["PAUD (Tematik/Umum)"];
 
-    // Fuzzy matching untuk nama Mapel yang aneh di dokumen (misal: "1. SENI MUSIK" vs "Seni Musik")
     const dbSubjectKey = Object.keys(faseData).find(key =>
       mapel.toLowerCase().includes(key.toLowerCase()) ||
       key.toLowerCase().includes(mapel.toLowerCase())
@@ -158,7 +180,7 @@ export default function ModulGenApp() {
     }
 
     const namaFase = currentFase.includes('Fase') ? currentFase : `Fase ${currentFase}`;
-    const faseData = dbAsAny[namaFase];
+    const faseData = dbAsAny.Fase?.[namaFase];
 
     if (faseData) {
       let dbSubjectKey = Object.keys(faseData).find(key =>
@@ -166,7 +188,7 @@ export default function ModulGenApp() {
         key.toLowerCase().includes(currentMapel.toLowerCase())
       );
       
-      if (currentMapel.includes("PAUD") && faseData["PAUD"]) dbSubjectKey = "PAUD";
+      if (currentMapel.includes("PAUD") && faseData["PAUD (Tematik/Umum)"]) dbSubjectKey = "PAUD (Tematik/Umum)";
 
       if (dbSubjectKey) {
         setAvailableCps(faseData[dbSubjectKey]);
@@ -279,17 +301,21 @@ export default function ModulGenApp() {
 
   const handleGenerateModul = (e: React.FormEvent) => {
     e.preventDefault();
-    if (selectedP5.length === 0) return showSystemModal("Validasi Gagal", "Pilih minimal 1 Dimensi Profil Pelajar Pancasila!");
+    if (selectedDPL.length === 0) return showSystemModal("Validasi Gagal", "Pilih minimal 1 Dimensi Profil Lulusan (DPL)!");
     if (!formData.cp) return showSystemModal("Validasi Gagal", "Capaian Pembelajaran tidak boleh kosong!");
+    if (!formData.tp) return showSystemModal("Validasi Gagal", "Tujuan Pembelajaran tidak boleh kosong!");
+    if (selectedMetode.length === 0) return showSystemModal("Validasi Gagal", "Pilih minimal 1 Metode Pembelajaran!");
+    
     const currentYear = new Date().getFullYear();
     const dateString = new Date().toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' });
 
     const prompt = `Anda adalah ahli kurikulum pendidikan Indonesia. Buatkan Modul Ajar (RPP) yang SANGAT DETAIL berformat HTML murni.
-Data: Guru: ${formData.guru} | Sekolah: ${formData.sekolah} | Kelas/Fase: ${formData.kelas}/${formData.fase} | Mapel: ${formData.mapel} | Topik: ${formData.topik} | CP: ${formData.cp} | P5: ${selectedP5.join(', ')} | Waktu: ${formData.pertemuan} Pertemuan (${formData.jp}) | Model: ${formData.model} | Karakteristik: ${formData.karakteristik}.
+Data: Guru: ${formData.guru} | Sekolah: ${formData.sekolah} | Kelas/Fase: ${formData.kelas}/${formData.fase} | Mapel: ${formData.mapel} | Topik: ${formData.topik} | CP: ${formData.cp} | Tujuan Pembelajaran: ${formData.tp} | Dimensi Profil Lulusan: ${selectedDPL.join(', ')} | Waktu: ${formData.pertemuan} Pertemuan (${formData.jp}) | Model: ${formData.model} | Metode: ${selectedMetode.join(', ')} | Karakteristik: ${formData.karakteristik}.
 
 ATURAN MUTLAK:
 1. Kembalikan HANYA tag HTML murni (tanpa \`\`\`html).
 2. IKUTI CETAKAN TEMPLATE HTML INI 100%. Jangan merusak inline CSS. Ganti [KURUNG SIKU] dengan penjelasan materi yang panjang, padat, dan akademis!
+3. PENTING: Untuk durasi waktu di tabel Kegiatan Pembelajaran, asumsikan 1 JP = 40 menit. Hitung total menit per pertemuan (misal 2 JP = 80 menit). Alokasikan 15 menit untuk Pendahuluan, 15 menit untuk Penutup, dan SISANYA untuk Kegiatan Inti. Jangan tulis "[..] Mnt", tuliskan angka pastinya!
 
 <div style="font-family: 'Times New Roman', Times, serif; font-size: 12pt; line-height: 1.5; color: black; max-width: 900px; margin: auto;">
     <h2 style="color: #16a34a; font-weight: bold; border-bottom: 2px solid #16a34a; padding-bottom: 5px;">I. INFORMASI UMUM</h2>
@@ -305,20 +331,21 @@ ATURAN MUTLAK:
         <tr><td style="padding: 4px; border: none; vertical-align: top;">Fase</td><td style="padding: 4px; border: none;">: ${formData.fase}</td></tr>
         <tr><td style="padding: 4px; border: none; vertical-align: top;">Capaian Pembelajaran</td><td style="padding: 4px; border: none; text-align: justify;">: ${formData.cp}</td></tr>
         <tr><td style="padding: 4px; border: none; vertical-align: top;">Materi Pokok</td><td style="padding: 4px; border: none;">: ${formData.topik}</td></tr>
-        <tr><td style="padding: 4px; border: none; vertical-align: top;">Profil Pelajar Pancasila</td><td style="padding: 4px; border: none;">: ${selectedP5.join(', ')}</td></tr>
+        <tr><td style="padding: 4px; border: none; vertical-align: top;">Dimensi Profil Lulusan</td><td style="padding: 4px; border: none;">: ${selectedDPL.join(', ')}</td></tr>
         <tr><td style="padding: 4px; border: none; vertical-align: top;">Kompetensi Awal</td><td style="padding: 4px; border: none; text-align: justify;">: [Sebutkan 2 kemampuan dasar yang harus dimiliki siswa sebelum materi ini]</td></tr>
-        <tr><td style="padding: 4px; border: none; vertical-align: top;">Target Peserta Didik</td><td style="padding: 4px; border: none;">: ${formData.karakteristik}</td></tr>
+        <tr><td style="padding: 4px; border: none; vertical-align: top;">Target Peserta Didik</td><td style="padding: 4px; border: none;">: ${formData.karakteristik || '[Karakteristik peserta didik]'}</td></tr>
         <tr><td style="padding: 4px; border: none; vertical-align: top;">Model Pembelajaran</td><td style="padding: 4px; border: none;">: ${formData.model}</td></tr>
+        <tr><td style="padding: 4px; border: none; vertical-align: top;">Metode Pembelajaran</td><td style="padding: 4px; border: none;">: ${selectedMetode.join(', ')}</td></tr>
     </table>
 
     <h4 style="color: #16a34a; margin-top: 15px;">Sarana dan Prasarana</h4>
     <table border="1" style="width: 100%; border-collapse: collapse; margin-bottom: 25px; border: 1px solid black; text-align: left;">
-        <tr><th style="padding: 8px; border: 1px solid black; background-color: #e5e7eb;">Materi</th><th style="padding: 8px; border: 1px solid black; background-color: #e5e7eb;">Media</th><th style="padding: 8px; border: 1px solid black; background-color: #e5e7eb;">Metode</th><th style="padding: 8px; border: 1px solid black; background-color: #e5e7eb;">Sumber</th></tr>
-        <tr><td style="padding: 8px; border: 1px solid black; vertical-align: top;">[Sebutkan sub-materi]</td><td style="padding: 8px; border: 1px solid black; vertical-align: top;">Laptop, Proyektor, LKPD, Spidol</td><td style="padding: 8px; border: 1px solid black; vertical-align: top;">Diskusi, Tanya Jawab, Ceramah, Presentasi</td><td style="padding: 8px; border: 1px solid black; vertical-align: top;">Buku Panduan, Internet</td></tr>
+        <tr><th style="padding: 8px; border: 1px solid black; background-color: #e5e7eb;">Materi</th><th style="padding: 8px; border: 1px solid black; background-color: #e5e7eb;">Media</th><th style="padding: 8px; border: 1px solid black; background-color: #e5e7eb;">Sumber</th></tr>
+        <tr><td style="padding: 8px; border: 1px solid black; vertical-align: top;">[Sebutkan sub-materi]</td><td style="padding: 8px; border: 1px solid black; vertical-align: top;">Laptop, Proyektor, LKPD, Spidol</td><td style="padding: 8px; border: 1px solid black; vertical-align: top;">Buku Panduan, Internet</td></tr>
     </table>
 
     <h2 style="color: #16a34a; font-weight: bold; border-bottom: 2px solid #16a34a; padding-bottom: 5px; margin-top: 30px;">II. KOMPONEN INTI</h2>
-    <p><strong>A. Tujuan Pembelajaran</strong><br>[Berikan 3-4 tujuan pembelajaran spesifik (C4-C6)]</p>
+    <p><strong>A. Tujuan Pembelajaran</strong><br>${formData.tp.replace(/\n/g, '<br>')}</p>
     <p><strong>B. Pemahaman Bermakna</strong><br>[Jelaskan esensi dan manfaat materi dalam kehidupan sehari-hari]</p>
     <p><strong>C. Pertanyaan Pemantik</strong><br>[Berikan 3 pertanyaan yang menggugah nalar siswa]</p>
     <p><strong>D. Persiapan Pembelajaran</strong><br>[Sebutkan 3 langkah persiapan guru]</p>
@@ -328,7 +355,7 @@ ATURAN MUTLAK:
     <table border="1" style="width: 100%; border-collapse: collapse; margin-bottom: 20px; border: 1px solid black;">
         <tr><th colspan="2" style="padding: 8px; background-color: #16a34a; color: white; text-align: left; border: 1px solid black;">PERTEMUAN [X]: [Judul Sub Topik]</th><th style="padding: 8px; background-color: #16a34a; color: white; text-align: center; border: 1px solid black; width: 15%;">Waktu</th></tr>
         <tr><td style="padding: 8px; border: 1px solid black; font-weight: bold; width: 20%;">Pendahuluan</td><td style="padding: 8px; border: 1px solid black; text-align: justify;">[Sebutkan 4 langkah: salam, doa, apersepsi, penyampaian tujuan]</td><td style="padding: 8px; border: 1px solid black; text-align: center;">15 Mnt</td></tr>
-        <tr><td style="padding: 8px; border: 1px solid black; font-weight: bold;">Kegiatan Inti<br>(${formData.model})</td><td style="padding: 8px; border: 1px solid black; text-align: justify;">[Sebutkan sintaks model pembelajaran secara terurut (Orientasi, Penyelidikan, dst). Sangat detail!]</td><td style="padding: 8px; border: 1px solid black; text-align: center;">[..] Mnt</td></tr>
+        <tr><td style="padding: 8px; border: 1px solid black; font-weight: bold;">Kegiatan Inti<br>(${formData.model})<br>Metode: ${selectedMetode.join(', ')}</td><td style="padding: 8px; border: 1px solid black; text-align: justify;">[Sebutkan sintaks model pembelajaran secara terurut (Orientasi, Penyelidikan, dst) dan terapkan metode yang dipilih. Sangat detail!]</td><td style="padding: 8px; border: 1px solid black; text-align: center;">[..] Mnt</td></tr>
         <tr><td style="padding: 8px; border: 1px solid black; font-weight: bold;">Penutup</td><td style="padding: 8px; border: 1px solid black; text-align: justify;">[Sebutkan refleksi, kesimpulan, dan arahan tugas]</td><td style="padding: 8px; border: 1px solid black; text-align: center;">15 Mnt</td></tr>
     </table>
 
@@ -350,7 +377,7 @@ ATURAN MUTLAK:
     <p><strong>Refleksi Guru:</strong> [Buat 3 poin pertanyaan refleksi evaluasi mengajar untuk guru]</p>
 
     <table style="width: 100%; margin-top: 60px; border:none;">
-        <tr><td style="width: 50%; border:none; text-align:center;">Mengetahui,<br>Kepala Sekolah<br><br><br><br><br><b>${formData.kepsek}</b></td><td style="width: 50%; border:none; text-align:center;">...................., ${dateString}<br>Guru Mata Pelajaran<br><br><br><br><br><b>${formData.guru}</b></td></tr>
+        <tr><td style="width: 50%; border:none; text-align:center;">Mengetahui,<br>Kepala Sekolah<br><br><br><br><br><b>${formData.kepsek || '....................'}</b></td><td style="width: 50%; border:none; text-align:center;">...................., ${dateString}<br>Guru Mata Pelajaran<br><br><br><br><br><b>${formData.guru}</b></td></tr>
     </table>
     
     <hr style="margin-top: 50px; border: 0; border-top: 1px solid #ccc;" />
@@ -598,6 +625,7 @@ STRUKTUR HTML YANG WAJIB DIIKUTI:
           </>
         )}
 
+        {/* HALAMAN PRICING */}
         {activeTab === 'pricing' && (
           <section className="animate-fade max-w-5xl mx-auto pt-8 pb-12">
             <div className="text-center mb-16">
@@ -675,7 +703,9 @@ STRUKTUR HTML YANG WAJIB DIIKUTI:
 
             {genState === 'B' && (
               <div className="bg-surface border border-surface_border rounded-3xl p-6 sm:p-10 shadow-2xl mt-6">
-                <h2 className="text-2xl font-bold text-white mb-6 border-b border-surface_border pb-4">Data Modul Ajar</h2>
+                <h2 className="text-2xl font-bold text-white mb-6 border-b border-surface_border pb-4 flex items-center gap-3">
+                  <i className="fa-solid fa-file-signature text-orange-500"></i> Detail Modul Ajar
+                </h2>
                 <form onSubmit={handleGenerateModul} className="space-y-6">
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-5 p-5 bg-brand-900/20 border border-brand-500/20 rounded-xl">
@@ -690,7 +720,7 @@ STRUKTUR HTML YANG WAJIB DIIKUTI:
                   <div className="grid grid-cols-2 gap-5">
                     <div>
                       <label className="text-xs text-slate-400">Mata Pelajaran <span className="text-red-500">*</span></label>
-                      <select required className="w-full bg-background border border-surface_border rounded-lg px-4 py-3 mt-1 outline-none focus:border-brand-500 text-white" value={formData.mapel} onChange={e => setFormData({ ...formData, mapel: e.target.value })}>
+                      <select required className="w-full bg-background border border-surface_border rounded-lg px-4 py-3 mt-1 outline-none focus:border-brand-500 text-white" value={formData.mapel} onChange={(e) => handleMapelChange(e, 'modul')}>
                         <option value="" disabled>Pilih Mata Pelajaran...</option>
                         {mataPelajaranOptions.map(m => <option key={m} value={m}>{m}</option>)}
                       </select>
@@ -718,14 +748,26 @@ STRUKTUR HTML YANG WAJIB DIIKUTI:
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
                         Lihat & Pilih Capaian Pembelajaran (CP)
                       </button>
-                      <textarea required rows={8} placeholder="Atau ketik manual di sini..." className="w-full bg-surface border border-surface_border rounded-lg px-4 py-3 outline-none text-sm text-slate-300 min-h-[150px]" value={formData.cp} onChange={e => setFormData({ ...formData, cp: e.target.value })}></textarea>
+                      <textarea required rows={4} placeholder="Atau ketik manual di sini..." className="w-full bg-surface border border-surface_border rounded-lg px-4 py-3 outline-none text-sm text-slate-300 placeholder-slate-500 mb-4" value={formData.cp} onChange={e => setFormData({ ...formData, cp: e.target.value })}></textarea>
+                      
+                      <label className="text-xs text-slate-400 font-semibold mb-2 block">Tujuan Pembelajaran (TP) <span className="text-red-500">*</span></label>
+                      <textarea required rows={4} placeholder="Ketik Tujuan Pembelajaran berdasarkan CP di atas..." className="w-full bg-surface border border-surface_border rounded-lg px-4 py-3 outline-none text-sm text-slate-300 placeholder-slate-500" value={formData.tp} onChange={e => setFormData({ ...formData, tp: e.target.value })}></textarea>
                     </div>
 
                     <div className="col-span-2">
-                      <label className="block text-xs font-medium text-slate-400 mb-2">Profil Pelajar Pancasila <span className="text-[10px] text-slate-500">(maks 3)</span> <span className="text-red-500">*</span></label>
+                      <label className="block text-xs font-medium text-slate-400 mb-2">Metode Pembelajaran <span className="text-red-500">*</span></label>
                       <div className="flex flex-wrap gap-2">
-                        {p5Options.map(opt => (
-                          <div key={opt} onClick={() => { if (selectedP5.includes(opt)) setSelectedP5(selectedP5.filter(i => i !== opt)); else if (selectedP5.length < 3) setSelectedP5([...selectedP5, opt]); }} className={`cursor-pointer px-3 py-1.5 rounded-full border text-xs font-medium ${selectedP5.includes(opt) ? 'bg-brand-500 text-white border-brand-600' : 'bg-background text-slate-300 border-surface_border'}`}>{opt}</div>
+                        {metodePembelajaranOptions.map(opt => (
+                          <div key={opt} onClick={() => { if (selectedMetode.includes(opt)) setSelectedMetode(selectedMetode.filter(i => i !== opt)); else setSelectedMetode([...selectedMetode, opt]); }} className={`cursor-pointer px-3 py-1.5 rounded-full border text-xs font-medium transition-colors ${selectedMetode.includes(opt) ? 'bg-orange-500 text-white border-orange-600' : 'bg-background text-slate-300 border-surface_border hover:border-slate-500'}`}>{opt}</div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="col-span-2">
+                      <label className="block text-xs font-medium text-slate-400 mb-2">Dimensi Profil Lulusan (DPL) <span className="text-[10px] text-slate-500">(maks 3)</span> <span className="text-red-500">*</span></label>
+                      <div className="flex flex-wrap gap-2">
+                        {dplOptions.map(opt => (
+                          <div key={opt} onClick={() => { if (selectedDPL.includes(opt)) setSelectedDPL(selectedDPL.filter(i => i !== opt)); else if (selectedDPL.length < 3) setSelectedDPL([...selectedDPL, opt]); }} className={`cursor-pointer px-3 py-1.5 rounded-full border text-xs font-medium transition-colors ${selectedDPL.includes(opt) ? 'bg-brand-500 text-white border-brand-600' : 'bg-background text-slate-300 border-surface_border hover:border-slate-500'}`}>{opt}</div>
                         ))}
                       </div>
                     </div>
@@ -739,8 +781,8 @@ STRUKTUR HTML YANG WAJIB DIIKUTI:
                       <input placeholder="Contoh: Peserta didik reguler, tidak ada kesulitan belajar." className="w-full bg-background border border-surface_border rounded-lg px-4 py-3 mt-1 placeholder-slate-500" value={formData.karakteristik} onChange={e => setFormData({ ...formData, karakteristik: e.target.value })} />
                     </div>
                     <div className="pt-6 col-span-2">
-                      <button type="submit" disabled={isGenerating} className="w-full bg-gradient-to-r from-orange-600 to-orange-500 text-white font-bold py-4 rounded-lg shadow-md transition-all">
-                        {isGenerating ? 'Menyusun Modul...' : 'Generate Modul Ajar'}
+                      <button type="submit" disabled={isGenerating} className="w-full bg-gradient-to-r from-orange-600 to-orange-500 text-white font-bold py-4 rounded-lg shadow-md transition-all flex justify-center items-center gap-2">
+                        {isGenerating ? <><div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div> Menyusun Modul...</> : <><i className="fa-solid fa-wand-magic-sparkles"></i> Generate Modul Ajar</>}
                       </button>
                     </div>
                   </div>
@@ -791,8 +833,9 @@ STRUKTUR HTML YANG WAJIB DIIKUTI:
             )}
             {genState === 'B' && (
               <div className="bg-surface border border-surface_border rounded-3xl p-6 sm:p-10 shadow-2xl mt-6">
-                <h2 className="text-2xl font-bold text-white mb-6 border-b border-surface_border pb-4">Data LKPD</h2>
-                
+                <h2 className="text-2xl font-bold text-white mb-6 border-b border-surface_border pb-4 flex items-center gap-3">
+                  <i className="fa-solid fa-file-signature text-emerald-500"></i> Detail LKPD
+                </h2>
                 <form onSubmit={handleGenerateLKPD} className="space-y-6">
                   <div className="grid grid-cols-2 gap-5">
                     <div>
@@ -814,7 +857,7 @@ STRUKTUR HTML YANG WAJIB DIIKUTI:
                   <div className="grid grid-cols-2 gap-5">
                     <div>
                       <label className="text-xs text-slate-400">Mata Pelajaran <span className="text-red-500">*</span></label>
-                      <select required className="w-full bg-background border border-surface_border text-white rounded-lg px-4 py-3 mt-1 outline-none focus:border-brand-500" value={lkpdData.mapel} onChange={e => setLkpdData({ ...lkpdData, mapel: e.target.value })}>
+                      <select required className="w-full bg-background border border-surface_border text-white rounded-lg px-4 py-3 mt-1 outline-none focus:border-brand-500" value={lkpdData.mapel} onChange={(e) => handleMapelChange(e, 'lkpd')}>
                         <option value="" disabled>Pilih Mata Pelajaran...</option>
                         {mataPelajaranOptions.map(m => <option key={m} value={m}>{m}</option>)}
                       </select>
@@ -833,7 +876,11 @@ STRUKTUR HTML YANG WAJIB DIIKUTI:
                       <textarea required rows={4} className="w-full bg-surface border border-surface_border rounded-lg px-4 py-3 outline-none text-sm text-slate-300 placeholder-slate-500" value={lkpdData.cp} onChange={e => setLkpdData({ ...lkpdData, cp: e.target.value })} placeholder="CP akan terisi otomatis saat topik dipilih..."></textarea>
                   </div>
 
-                  <div className="pt-6"><button type="submit" disabled={isGenerating} className="w-full bg-gradient-to-r from-emerald-600 to-emerald-500 text-white font-bold py-4 rounded-lg shadow-md">{isGenerating ? 'MEMPROSES LKPD...' : 'GENERATE LKPD SEKARANG'}</button></div>
+                  <div className="pt-6">
+                    <button type="submit" disabled={isGenerating} className="w-full bg-gradient-to-r from-emerald-600 to-emerald-500 text-white font-bold py-4 rounded-lg shadow-md transition-all flex justify-center items-center gap-2">
+                      {isGenerating ? <><div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div> Menyusun LKPD...</> : <><i className="fa-solid fa-flask"></i> Generate LKPD Sekarang</>}
+                    </button>
+                  </div>
                 </form>
               </div>
             )}
@@ -919,7 +966,7 @@ STRUKTUR HTML YANG WAJIB DIIKUTI:
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                       <label className="block text-xs font-semibold text-slate-400 mb-2">4. Mata Pelajaran <span className="text-red-500">*</span></label>
-                      <select required className="w-full bg-background border border-surface_border rounded-lg p-3 text-white outline-none focus:border-amber-500" value={ujianData.mapel} onChange={e => setUjianData({ ...ujianData, mapel: e.target.value })}>
+                      <select required className="w-full bg-background border border-surface_border rounded-lg p-3 text-white outline-none focus:border-amber-500" value={ujianData.mapel} onChange={(e) => handleMapelChange(e, 'ujian')}>
                         <option value="" disabled>Pilih Mata Pelajaran...</option>
                         {mataPelajaranOptions.map(m => <option key={m} value={m}>{m}</option>)}
                       </select>
