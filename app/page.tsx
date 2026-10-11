@@ -115,6 +115,38 @@ export default function ModulGenApp() {
   const [tempSelectedCp, setTempSelectedCp] = useState<string[]>([]);
   const [availableCps, setAvailableCps] = useState<any[]>([]);
 
+  // --- STATE TAMBAHAN UNTUK FITUR BARU ---
+  const [searchQuery, setSearchQuery] = useState("");
+  const [loadingMsgIdx, setLoadingMsgIdx] = useState(0);
+
+  const loadingMessages = [
+    "Membedah Capaian Pembelajaran...",
+    "Menganalisis Target Karakteristik Siswa...",
+    "Merancang Kegiatan Pembelajaran...",
+    "Menyusun Rubrik Penilaian...",
+    "Menyiapkan Lampiran Materi...",
+    "Sedikit lagi selesai, mohon tunggu sebentar..."
+  ];
+
+  // Efek interval ganti teks loading tiap 4.5 detik
+  useEffect(() => {
+    let interval: any;
+    if (isGenerating) {
+      interval = setInterval(() => {
+        setLoadingMsgIdx((prev) => (prev + 1) % loadingMessages.length);
+      }, 4500);
+    } else {
+      setLoadingMsgIdx(0);
+    }
+    return () => clearInterval(interval);
+  }, [isGenerating, loadingMessages.length]);
+
+  // Filter daftar brankas
+  const filteredDokumen = daftarDokumen.filter(dok =>
+    dok.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    dok.doc_type.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   // ========================================================
   // LOGIKA AUTO-FILL CP CERDAS (DARI JSON VERSI TERBARU)
   // ========================================================
@@ -242,6 +274,18 @@ export default function ModulGenApp() {
     else if (data) setDaftarDokumen(data);
   };
 
+  // Fungsi Hapus Dokumen di Brankas
+  const handleDeleteDokumen = async (id: string) => {
+    if (!confirm("Apakah Anda yakin ingin menghapus dokumen ini? Dokumen yang dihapus tidak dapat dikembalikan.")) return;
+    const { error } = await supabase.from('documents').delete().eq('id', id);
+    if (error) {
+      console.error("Gagal menghapus", error);
+      showSystemModal("Error", "Gagal menghapus dokumen dari server.");
+    } else {
+      setDaftarDokumen(daftarDokumen.filter(dok => dok.id !== id));
+    }
+  };
+
   const fetchAI = async (prompt: string, docType: string) => {
     if (!currentUser || !currentUser.email) return showSystemModal("Validasi Gagal", "Silakan login terlebih dahulu!");
     if (userQuota <= 0) return showSystemModal("Kuota Habis", "Kuota uji coba Anda telah habis. Silakan periksa paket langganan.");
@@ -316,6 +360,7 @@ ATURAN MUTLAK:
 1. Kembalikan HANYA tag HTML murni (tanpa \`\`\`html).
 2. IKUTI CETAKAN TEMPLATE HTML INI 100%. Jangan merusak inline CSS. Ganti [KURUNG SIKU] dengan penjelasan materi yang panjang, padat, dan akademis!
 3. PENTING: Untuk durasi waktu di tabel Kegiatan Pembelajaran, asumsikan 1 JP = 40 menit. Hitung total menit per pertemuan (misal 2 JP = 80 menit). Alokasikan 15 menit untuk Pendahuluan, 15 menit untuk Penutup, dan SISANYA untuk Kegiatan Inti. Jangan tulis "[..] Mnt", tuliskan angka pastinya!
+4. Di bagian akhir, setelah tabel Refleksi, buatkan Bab "I. LAMPIRAN: BAHAN BACAAN / RINGKASAN MATERI". Tulis ringkasan materi secara komprehensif 3-4 paragraf yang sesuai dengan Topik Pembelajaran tersebut.
 
 <div style="font-family: 'Times New Roman', Times, serif; font-size: 12pt; line-height: 1.5; color: black; max-width: 900px; margin: auto;">
     <h2 style="color: #16a34a; font-weight: bold; border-bottom: 2px solid #16a34a; padding-bottom: 5px;">I. INFORMASI UMUM</h2>
@@ -379,6 +424,9 @@ ATURAN MUTLAK:
     <table style="width: 100%; margin-top: 60px; border:none;">
         <tr><td style="width: 50%; border:none; text-align:center;">Mengetahui,<br>Kepala Sekolah<br><br><br><br><br><b>${formData.kepsek || '....................'}</b></td><td style="width: 50%; border:none; text-align:center;">...................., ${dateString}<br>Guru Mata Pelajaran<br><br><br><br><br><b>${formData.guru}</b></td></tr>
     </table>
+    
+    <h2 style="color: #16a34a; font-weight: bold; border-bottom: 2px solid #16a34a; padding-bottom: 5px; margin-top: 40px; page-break-before: always;">I. LAMPIRAN: BAHAN BACAAN / RINGKASAN MATERI</h2>
+    <p>[Silakan AI isi dengan ringkasan materi secara lengkap...]</p>
     
     <hr style="margin-top: 50px; border: 0; border-top: 1px solid #ccc;" />
     <p style="font-size: 10pt; color: #666; font-style: italic; text-align: center;">*Dokumen modul hasil generate dari Modul Ajar Guru Hebat. Harap tinjau kembali kesesuaian materi.</p>
@@ -496,23 +544,25 @@ STRUKTUR HTML YANG WAJIB DIIKUTI:
     fetchAI(prompt, `Ujian_${ujianData.mapel.replace(/ /g, '_')}`);
   };
 
-  const exportToWord = () => {
-    const htmlDoc = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Dokumen</title></head><body>${resultHtml}</body></html>`;
+  const exportToWord = (targetId: string) => {
+    const element = document.getElementById(targetId);
+    if (!element) return;
+    const htmlDoc = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Dokumen</title></head><body>${element.innerHTML}</body></html>`;
     const blob = new Blob(['\ufeff', htmlDoc], { type: 'application/msword' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a'); link.href = url; link.download = `${activeDocType}_${Date.now()}.doc`;
     link.click(); URL.revokeObjectURL(url);
   };
 
-  const exportToPDF = () => {
-    const element = document.getElementById('generatedContent');
-    if (typeof window !== 'undefined' && (window as any).html2pdf) {
+  const exportToPDF = (targetId: string) => {
+    const element = document.getElementById(targetId);
+    if (typeof window !== 'undefined' && (window as any).html2pdf && element) {
       const opt = { margin: [15, 15, 15, 15], filename: `${activeDocType}_${Date.now()}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, useCORS: true }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } };
-      const origStyle = element?.getAttribute('style');
-      if (element) { element.style.backgroundColor = 'white'; element.style.color = 'black'; element.style.padding = '0'; }
+      const origStyle = element.getAttribute('style');
+      element.style.backgroundColor = 'white'; element.style.color = 'black'; element.style.padding = '20px';
       (window as any).html2pdf().set(opt).from(element).save().then(() => {
-        if (element && origStyle) element.setAttribute('style', origStyle);
-        else if (element) element.removeAttribute('style');
+        if (origStyle) element.setAttribute('style', origStyle);
+        else element.removeAttribute('style');
       });
     } else showSystemModal("Mohon Tunggu", "Sistem PDF sedang dimuat browser.");
   };
@@ -1063,19 +1113,30 @@ STRUKTUR HTML YANG WAJIB DIIKUTI:
         {genState === 'C' && (
           <div className="bg-surface border border-surface_border rounded-3xl p-6 sm:p-10 shadow-xl mt-6 max-w-4xl mx-auto">
             {isGenerating ? (
-              <div className="flex flex-col items-center justify-center py-20 text-center"><div className="loader mb-6"></div><h3 className="text-xl font-bold text-white mb-2">⏳ Menyusun Dokumen...</h3><p className="text-slate-400 text-sm">AI sedang mengetik dan merakit struktur dokumen.</p></div>
+              <div className="flex flex-col items-center justify-center py-20 text-center">
+                <div className="loader mb-6"></div>
+                <h3 className="text-xl font-bold text-white mb-2">⏳ {loadingMessages[loadingMsgIdx]}</h3>
+                <p className="text-slate-400 text-sm">AI sedang mengetik dan merakit struktur dokumen.</p>
+              </div>
             ) : (
               <div className="animate-fade w-full">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 border-b border-surface_border pb-4 gap-4">
-                  <div><h2 className="text-2xl font-bold text-white">Hasil Dokumen</h2><p className="text-sm text-slate-400">Silakan tinjau dan unduh PDF.</p></div>
+                  <div><h2 className="text-2xl font-bold text-white">Hasil Dokumen</h2><p className="text-sm text-slate-400">Tinjau, edit langsung teks di bawah, atau unduh.</p></div>
                   <div className="flex flex-wrap gap-2">
                     <button onClick={() => setGenState('B')} className="px-4 py-2 border border-surface_border bg-background rounded-md text-slate-300 hover:text-white text-sm font-semibold"><i className="fa-solid fa-arrow-left mr-1"></i> Edit Form</button>
-                    <button onClick={exportToWord} className="px-4 py-2 bg-blue-500/20 text-blue-400 border border-blue-500/30 rounded-md hover:bg-blue-500/30 text-sm font-semibold"><i className="fa-solid fa-file-word mr-1"></i> Word</button>
-                    <button onClick={exportToPDF} className="px-4 py-2 bg-red-500/20 text-red-400 border border-red-500/30 rounded-md hover:bg-red-500/30 text-sm font-semibold"><i className="fa-solid fa-file-pdf mr-1"></i> PDF</button>
+                    <button onClick={() => exportToWord('generatedContent')} className="px-4 py-2 bg-blue-500/20 text-blue-400 border border-blue-500/30 rounded-md hover:bg-blue-500/30 text-sm font-semibold"><i className="fa-solid fa-file-word mr-1"></i> Word</button>
+                    <button onClick={() => exportToPDF('generatedContent')} className="px-4 py-2 bg-red-500/20 text-red-400 border border-red-500/30 rounded-md hover:bg-red-500/30 text-sm font-semibold"><i className="fa-solid fa-file-pdf mr-1"></i> PDF</button>
                   </div>
                 </div>
+                
+                {/* --- BANNER EDITABLE --- */}
+                <div className="bg-blue-900/40 border border-blue-500/50 text-blue-200 px-4 py-3 rounded-lg mb-4 flex items-start gap-3 text-sm">
+                    <i className="fa-solid fa-pen-to-square mt-0.5 text-blue-400"></i>
+                    <p><strong>Mode Edit Aktif:</strong> Anda dapat mengklik dan mengedit teks pada dokumen di bawah ini secara langsung sebelum menyimpannya ke Word atau PDF.</p>
+                </div>
+
                 <div id="exportableContentWrapper" className="overflow-y-auto max-h-[65vh] bg-slate-200 p-8 rounded-lg">
-                  <div id="generatedContent" style={{ backgroundColor: 'white', padding: '40px', minHeight: '800px' }} dangerouslySetInnerHTML={{ __html: resultHtml }} />
+                  <div id="generatedContent" className="outline-none" contentEditable suppressContentEditableWarning style={{ backgroundColor: 'white', padding: '40px', minHeight: '800px', cursor: 'text' }} dangerouslySetInnerHTML={{ __html: resultHtml }} />
                 </div>
               </div>
             )}
@@ -1153,35 +1214,51 @@ STRUKTUR HTML YANG WAJIB DIIKUTI:
           </div>
 
           <div className="bg-slate-800/40 backdrop-blur-md border border-slate-700/50 rounded-3xl p-6 sm:p-10 shadow-2xl relative z-10">
-            <div className="flex justify-between items-center mb-8 border-b border-slate-700/50 pb-4">
-              <h3 className="text-lg font-semibold text-white">Daftar Dokumen <span className="text-slate-400 text-sm font-normal">({daftarDokumen.length} Total)</span></h3>
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 border-b border-slate-700/50 pb-4 gap-4">
+              <h3 className="text-lg font-semibold text-white">Daftar Dokumen <span className="text-slate-400 text-sm font-normal">({filteredDokumen.length} Total)</span></h3>
+              
+              {/* --- FITUR PENCARIAN BRANKAS --- */}
+              <div className="relative w-full md:w-64">
+                <i className="fa-solid fa-magnifying-glass absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400"></i>
+                <input 
+                  type="text" 
+                  placeholder="Cari mapel / jenis dokumen..." 
+                  className="w-full bg-slate-900 border border-slate-600 rounded-lg pl-9 pr-4 py-2 text-sm text-white focus:outline-none focus:border-orange-500"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+              </div>
             </div>
 
-            {daftarDokumen.length === 0 ? (
+            {filteredDokumen.length === 0 ? (
               <div className="text-center py-20 bg-slate-900/50 rounded-2xl border border-slate-700 border-dashed">
                 <div className="w-16 h-16 bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-400 text-2xl">
                   <i className="fa-regular fa-folder-open"></i>
                 </div>
-                <p className="text-slate-300 text-lg font-medium">Brankas masih kosong</p>
-                <p className="text-slate-500 text-sm mt-2">Dokumen yang Anda generate akan otomatis muncul di sini.</p>
+                <p className="text-slate-300 text-lg font-medium">{daftarDokumen.length === 0 ? "Brankas masih kosong" : "Dokumen tidak ditemukan"}</p>
+                <p className="text-slate-500 text-sm mt-2">{daftarDokumen.length === 0 ? "Dokumen yang Anda generate akan otomatis muncul di sini." : "Coba gunakan kata kunci pencarian yang lain."}</p>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {daftarDokumen.map((dok) => (
+                {filteredDokumen.map((dok) => (
                   <div key={dok.id} className="bg-slate-900 border border-slate-700 p-5 rounded-2xl flex flex-col justify-between hover:border-orange-500 hover:shadow-[0_0_20px_rgba(249,115,22,0.1)] transition-all duration-300 group">
                     <div>
                       <div className="flex justify-between items-start mb-4">
                         <span className="text-[10px] uppercase tracking-wider font-bold bg-orange-500/10 text-orange-400 px-3 py-1 rounded-full border border-orange-500/20">
                           {dok.doc_type}
                         </span>
-                        <div className="text-slate-500 text-xs flex items-center gap-1.5 font-medium">
-                          <i className="fa-regular fa-calendar"></i>
-                          {new Date(dok.created_at).toLocaleDateString('id-ID')}
-                        </div>
+                        {/* --- TOMBOL HAPUS DOKUMEN --- */}
+                        <button onClick={() => handleDeleteDokumen(dok.id)} className="text-slate-500 hover:text-red-500 transition-colors" title="Hapus Dokumen">
+                          <i className="fa-solid fa-trash-can"></i>
+                        </button>
                       </div>
                       <h3 className="text-slate-200 font-bold text-lg mb-2 line-clamp-2 group-hover:text-orange-400 transition-colors">
                         {dok.title}
                       </h3>
+                      <div className="text-slate-500 text-xs flex items-center gap-1.5 font-medium mt-3">
+                         <i className="fa-regular fa-calendar"></i>
+                         {new Date(dok.created_at).toLocaleDateString('id-ID')}
+                      </div>
                     </div>
 
                     <button
@@ -1197,20 +1274,27 @@ STRUKTUR HTML YANG WAJIB DIIKUTI:
           </div>
         </section>
       )}
-      {/* POP-UP BACA DOKUMEN */}
+      {/* POP-UP BACA DOKUMEN (READ & EDIT) */}
       {selectedContent && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 md:p-8 animate-fade">
           <div className="bg-white text-black w-full max-w-5xl h-full max-h-[90vh] rounded-2xl flex flex-col overflow-hidden shadow-2xl">
             <div className="p-4 border-b flex justify-between items-center bg-slate-100">
-              <h3 className="font-bold text-lg text-slate-800">Pratinjau Dokumen</h3>
+              <h3 className="font-bold text-lg text-slate-800">Dokumen Anda</h3>
               <div className="flex gap-3">
-                <button onClick={exportToPDF} className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg font-bold transition-colors flex items-center gap-2 text-sm"><i className="fa-solid fa-file-pdf"></i> Download PDF</button>
-                <button onClick={exportToWord} className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-bold transition-colors flex items-center gap-2 text-sm"><i className="fa-solid fa-file-word"></i> Download Doc</button>
+                <button onClick={() => exportToPDF('previewContent')} className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg font-bold transition-colors flex items-center gap-2 text-sm"><i className="fa-solid fa-file-pdf"></i> Download PDF</button>
+                <button onClick={() => exportToWord('previewContent')} className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-bold transition-colors flex items-center gap-2 text-sm"><i className="fa-solid fa-file-word"></i> Download Doc</button>
                 <button onClick={() => setSelectedContent(null)} className="bg-red-500 hover:bg-red-600 text-white px-5 py-2 rounded-lg font-bold transition-colors text-sm">Tutup</button>
               </div>
             </div>
-            <div className="p-8 overflow-y-auto flex-1 font-sans">
-              <div dangerouslySetInnerHTML={{ __html: selectedContent }} />
+            
+            {/* --- BANNER EDITABLE POP-UP --- */}
+            <div className="bg-amber-100 border-b border-amber-200 text-amber-800 px-6 py-2 flex items-center gap-3 text-sm">
+                <i className="fa-solid fa-pen-to-square"></i>
+                <p>Dokumen ini dapat diedit. Klik bagian teks mana saja di bawah untuk mengubah isinya sebelum diunduh.</p>
+            </div>
+
+            <div className="p-8 overflow-y-auto flex-1 font-sans bg-slate-200">
+              <div id="previewContent" className="outline-none" contentEditable suppressContentEditableWarning style={{ backgroundColor: 'white', padding: '40px', minHeight: '800px', cursor: 'text' }} dangerouslySetInnerHTML={{ __html: selectedContent }} />
             </div>
           </div>
         </div>
