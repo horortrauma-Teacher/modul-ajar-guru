@@ -115,7 +115,6 @@ export default function ModulGenApp() {
   const [tempSelectedCp, setTempSelectedCp] = useState<string[]>([]);
   const [availableCps, setAvailableCps] = useState<any[]>([]);
 
-  // --- STATE TAMBAHAN UNTUK FITUR BARU ---
   const [searchQuery, setSearchQuery] = useState("");
   const [loadingMsgIdx, setLoadingMsgIdx] = useState(0);
 
@@ -128,7 +127,6 @@ export default function ModulGenApp() {
     "Sedikit lagi selesai, mohon tunggu sebentar..."
   ];
 
-  // Efek interval ganti teks loading tiap 4.5 detik
   useEffect(() => {
     let interval: any;
     if (isGenerating) {
@@ -141,7 +139,6 @@ export default function ModulGenApp() {
     return () => clearInterval(interval);
   }, [isGenerating, loadingMessages.length]);
 
-  // Filter daftar brankas
   const filteredDokumen = daftarDokumen.filter(dok =>
     dok.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
     dok.doc_type.toLowerCase().includes(searchQuery.toLowerCase())
@@ -253,7 +250,6 @@ export default function ModulGenApp() {
     }
     setShowCpModal(false);
   };
-  // ========================================================
 
   useEffect(() => {
     const savedSession = localStorage.getItem('modulgen_dummy_user');
@@ -274,7 +270,6 @@ export default function ModulGenApp() {
     else if (data) setDaftarDokumen(data);
   };
 
-  // Fungsi Hapus Dokumen di Brankas
   const handleDeleteDokumen = async (id: string) => {
     if (!confirm("Apakah Anda yakin ingin menghapus dokumen ini? Dokumen yang dihapus tidak dapat dikembalikan.")) return;
     const { error } = await supabase.from('documents').delete().eq('id', id);
@@ -670,6 +665,7 @@ STRUKTUR HTML YANG WAJIB DIIKUTI:
                 <HowItWorksSection />
                 <SimulationSection />
                 <FAQSection />
+                <ArticleSection />
               </div>
             )}
           </>
@@ -1302,6 +1298,72 @@ STRUKTUR HTML YANG WAJIB DIIKUTI:
     </div>
   );
 }
+
+function ArticleSection() {
+  const [articles, setArticles] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchArticles() {
+      const { data, error } = await supabase
+        .from('articles')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(3); 
+
+      if (!error && data) {
+        setArticles(data);
+      }
+      setLoading(false);
+    }
+    fetchArticles();
+  }, []);
+
+  return (
+    <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-24 relative z-10 border-t border-slate-700/50">
+      <div className="flex flex-col md:flex-row justify-between items-end mb-12">
+        <div className="max-w-2xl">
+          <div className="inline-block px-4 py-1.5 bg-blue-500/10 text-blue-400 text-sm font-semibold rounded-full mb-4 border border-blue-500/20">
+            <i className="fa-solid fa-newspaper mr-2"></i> Artikel & Wawasan
+          </div>
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Ruang Belajar Pendidik</h2>
+          <p className="text-slate-400 text-sm md:text-base">Temukan berbagai tips, trik, dan panduan seputar implementasi Kurikulum Merdeka dan pemanfaatan AI dalam pendidikan.</p>
+        </div>
+        <button className="hidden md:block px-6 py-2.5 bg-slate-800 hover:bg-slate-700 text-white rounded-full text-sm font-semibold transition-colors border border-slate-600">
+          Lihat Semua Artikel
+        </button>
+      </div>
+
+      {loading ? (
+         <div className="text-center py-10 text-slate-400">Memuat artikel...</div>
+      ) : articles.length === 0 ? (
+         <div className="text-center py-10 text-slate-400">Belum ada artikel.</div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {articles.map((art, idx) => (
+            <Link href={`/artikel/${art.slug}`} key={idx} className="bg-slate-900 border border-slate-700 rounded-3xl overflow-hidden group hover:border-slate-500 transition-all duration-300 hover:shadow-[0_0_20px_rgba(59,130,246,0.1)] flex flex-col">
+              <div className="h-48 overflow-hidden relative">
+                <div className="absolute top-4 left-4 z-10 bg-slate-900/80 backdrop-blur text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider border border-slate-600">
+                  {art.category}
+                </div>
+                <img src={art.image_url} alt={art.title} className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700" />
+              </div>
+              <div className="p-6 flex-grow flex flex-col">
+                <div className="text-slate-500 text-xs mb-3 font-medium"><i className="fa-regular fa-calendar mr-2"></i>{new Date(art.created_at).toLocaleDateString('id-ID', {day: 'numeric', month: 'short', year: 'numeric'})}</div>
+                <h3 className="text-xl font-bold text-slate-200 mb-3 group-hover:text-blue-400 transition-colors line-clamp-2">{art.title}</h3>
+                <p className="text-slate-400 text-sm leading-relaxed mb-6 line-clamp-3">{art.description}</p>
+                <div className="mt-auto font-semibold text-blue-500 text-sm group-hover:text-blue-400 flex items-center cursor-pointer">
+                  Baca Selengkapnya <i className="fa-solid fa-arrow-right ml-2 transform group-hover:translate-x-1 transition-transform"></i>
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
+      )}
+    </section>
+  );
+}
+
 function FAQSection() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
@@ -1372,6 +1434,7 @@ function FAQSection() {
     </section>
   );
 }
+
 function FeatureSection({ switchTab }: { switchTab: (tab: string) => void }) {
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -1461,6 +1524,7 @@ function FeatureSection({ switchTab }: { switchTab: (tab: string) => void }) {
     </section>
   );
 }
+
 function HowItWorksSection() {
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -1515,6 +1579,7 @@ function HowItWorksSection() {
     </section>
   );
 }
+
 function SimulationSection() {
   const [activeSim, setActiveSim] = useState<'modul' | 'soal' | 'lkpd'>('lkpd');
 
