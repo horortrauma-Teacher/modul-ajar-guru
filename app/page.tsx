@@ -562,7 +562,7 @@ STRUKTUR HTML YANG WAJIB DIIKUTI:
             <span className="text-white font-bold text-lg tracking-tight hidden sm:block">Modul Ajar Guru Hebat</span>
             <span className="bg-gradient-to-r from-accent-500 to-amber-500 text-[10px] font-bold px-1.5 py-0.5 rounded text-white uppercase tracking-wider ml-1 shadow-sm">PRO</span>
           </div>
-          <div className="flex items-center gap-4 md:gap-8 text-sm font-semibold h-full pt-1">
+         <div className="flex items-center gap-4 sm:gap-6 overflow-x-auto whitespace-nowrap w-full pr-4 pb-1">
             {['beranda', 'generator', 'lkpd', 'soal', 'pricing', 'brankas'].map((tab) => (
               <button key={tab} onClick={() => switchTab(tab)} className={`h-full px-1 capitalize transition-colors ${tab === 'lkpd' || tab === 'soal' ? 'hidden md:block' : ''} ${activeTab === tab ? 'text-white border-b-2 border-accent-500' : 'text-slate-400 hover:text-white'}`}>
                 {tab === 'generator' ? 'Modul Ajar' : tab === 'soal' ? 'Soal HOTS' : tab === 'pricing' ? 'Harga' : tab === 'lkpd' ? 'LKPD' : tab === 'brankas' ? 'Brankas' : tab}
@@ -579,7 +579,7 @@ STRUKTUR HTML YANG WAJIB DIIKUTI:
                 <span className="text-[11px] font-bold text-slate-300 hidden md:flex items-center gap-1.5 bg-surface px-3 py-1.5 rounded-full border border-surface_border shadow-inner">
                   <span className={`w-2 h-2 rounded-full animate-pulse ${userQuota > 0 ? 'bg-green-400' : 'bg-red-400'}`}></span> Kuota: {userQuota}
                 </span>
-                <div className="relative group">
+                <div className="relative group z-50">
                   <div className="w-8 h-8 rounded-full bg-brand-500 text-white flex items-center justify-center font-bold text-sm cursor-pointer border-2 border-surface_border">{currentUser.name.charAt(0)}</div>
                   <div className="absolute right-0 mt-2 w-48 bg-surface border border-surface_border rounded-xl shadow-xl hidden group-hover:block z-50 overflow-hidden">
                     <div className="p-3 border-b border-surface_border bg-slate-800/50">
