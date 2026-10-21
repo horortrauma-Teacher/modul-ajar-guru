@@ -1122,9 +1122,9 @@ STRUKTUR HTML YANG WAJIB DIIKUTI:
                     <p><strong>Mode Edit Aktif:</strong> Anda dapat mengklik dan mengedit teks pada dokumen di bawah ini secara langsung sebelum menyimpannya ke Word atau PDF.</p>
                 </div>
 
-                <div id="exportableContentWrapper" className="overflow-y-auto max-h-[65vh] bg-slate-200 p-8 rounded-lg">
-                  <div id="generatedContent" className="outline-none" contentEditable suppressContentEditableWarning style={{ backgroundColor: 'white', padding: '40px', minHeight: '800px', cursor: 'text' }} dangerouslySetInnerHTML={{ __html: resultHtml }} />
-                </div>
+                <div id="exportableContentWrapper" className="overflow-auto max-h-[65vh] bg-slate-200 p-4 sm:p-8 rounded-lg w-full shadow-inner">
+  <div id="generatedContent" className="outline-none mx-auto shadow-md" contentEditable suppressContentEditableWarning style={{ backgroundColor: 'white', padding: '40px', minHeight: '800px', minWidth: '750px', maxWidth: '900px', cursor: 'text' }} dangerouslySetInnerHTML={{ __html: resultHtml }} />
+</div>
               </div>
             )}
           </div>
@@ -1280,9 +1280,9 @@ STRUKTUR HTML YANG WAJIB DIIKUTI:
                 <p>Dokumen ini dapat diedit. Klik bagian teks mana saja di bawah untuk mengubah isinya sebelum diunduh.</p>
             </div>
 
-            <div className="p-8 overflow-y-auto flex-1 font-sans bg-slate-200">
-              <div id="previewContent" className="outline-none" contentEditable suppressContentEditableWarning style={{ backgroundColor: 'white', padding: '40px', minHeight: '800px', cursor: 'text' }} dangerouslySetInnerHTML={{ __html: selectedContent }} />
-            </div>
+           <div className="p-4 sm:p-8 overflow-auto flex-1 font-sans bg-slate-200 w-full">
+  <div id="previewContent" className="outline-none mx-auto shadow-md" contentEditable suppressContentEditableWarning style={{ backgroundColor: 'white', padding: '40px', minHeight: '800px', minWidth: '750px', maxWidth: '900px', cursor: 'text' }} dangerouslySetInnerHTML={{ __html: selectedContent }} />
+</div>
           </div>
         </div>
       )}
