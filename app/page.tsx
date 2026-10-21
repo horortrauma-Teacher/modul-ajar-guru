@@ -281,23 +281,14 @@ export default function ModulGenApp() {
     }
   };
 
-  const fetchAI = async (prompt: string, docType: string) => {
+ const fetchAI = async (prompt: string, docType: string) => {
     if (!currentUser || !currentUser.email) return showSystemModal("Validasi Gagal", "Silakan login terlebih dahulu!");
     if (userQuota <= 0) return showSystemModal("Kuota Habis", "Kuota uji coba Anda telah habis. Silakan periksa paket langganan.");
     
     setGenState('C'); setIsGenerating(true); setActiveDocType(docType);
 
-    const apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
-
     try {
-      if (!apiKey) {
-        setTimeout(() => {
-          setResultHtml(`<div style="font-family:'Times New Roman'; padding:20px;"><h1>Perhatian</h1><p>API Key Gemini kosong. Silakan isi variabel apiKey di kodingan.</p></div>`);
-          setIsGenerating(false);
-        }, 2000);
-        return;
-      }
-
+      // 1. Kurangi kuota user dulu di Supabase
       const sisaKuotaBaru = userQuota - 1;
       const { error: updateError } = await supabase.from('users').update({ quota: sisaKuotaBaru }).eq('email', currentUser.email);
       if (updateError) throw new Error("Gagal menghubungi database untuk sinkronisasi kuota.");
@@ -305,17 +296,16 @@ export default function ModulGenApp() {
       setUserQuota(sisaKuotaBaru);
       localStorage.setItem('modulgen_dummy_user', JSON.stringify({ ...currentUser, quota: sisaKuotaBaru }));
 
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`, {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { temperature: 0.1, maxOutputTokens: 8192 }
-        })
+      // 2. Tembak ke API Route Backend kita yang aman (TIDAK LAGI TEMBAK GOOGLE LANGSUNG)
+      const response = await fetch('/api/generate', {
+        method: 'POST', 
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt })
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error?.message || `Gagal API: ${response.status}`);
+        throw new Error(errorData.error || `Gagal API: ${response.status}`);
       }
 
       const data = await response.json();
@@ -324,6 +314,7 @@ export default function ModulGenApp() {
 
       setResultHtml(cleanContent);
 
+      // 3. Simpan hasil ke brankas Supabase
       const { error: insertError } = await supabase.from('documents').insert([
           { user_email: currentUser.email, title: docType + " - " + new Date().toLocaleDateString('id-ID'), doc_type: docType, content: cleanContent }
         ]);
