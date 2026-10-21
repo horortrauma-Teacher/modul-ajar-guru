@@ -562,13 +562,13 @@ STRUKTUR HTML YANG WAJIB DIIKUTI:
             <span className="text-white font-bold text-lg tracking-tight hidden sm:block">Modul Ajar Guru Hebat</span>
             <span className="bg-gradient-to-r from-accent-500 to-amber-500 text-[10px] font-bold px-1.5 py-0.5 rounded text-white uppercase tracking-wider ml-1 shadow-sm">PRO</span>
           </div>
-         <div className="flex items-center gap-4 sm:gap-6 overflow-x-auto whitespace-nowrap w-full pr-4 pb-1">
+        <div className="flex items-center gap-6 md:gap-10 md:ml-12 overflow-x-auto whitespace-nowrap w-full pr-4 pb-1 md:pb-0">
             {['beranda', 'generator', 'lkpd', 'soal', 'pricing', 'brankas'].map((tab) => (
-             <button 
-  key={tab} 
-  onClick={() => switchTab(tab)} 
-  className={`h-full px-1 capitalize transition-colors whitespace-nowrap ${activeTab === tab ? 'text-white border-b-2 border-accent-500' : 'text-slate-400 hover:text-white'}`}
->
+              <button
+                key={tab}
+                onClick={() => switchTab(tab)}
+                className={`h-full px-3 md:px-4 capitalize transition-colors whitespace-nowrap ... ${activeTab === tab ? 'text-white border-b-2 border-accent-500' : 'text-slate-400 hover:text-white'}`}
+              >
                 {tab === 'generator' ? 'Modul Ajar' : tab === 'soal' ? 'Soal HOTS' : tab === 'pricing' ? 'Harga' : tab === 'lkpd' ? 'LKPD' : tab === 'brankas' ? 'Brankas' : tab}
               </button>
             ))}
