@@ -564,7 +564,11 @@ STRUKTUR HTML YANG WAJIB DIIKUTI:
           </div>
          <div className="flex items-center gap-4 sm:gap-6 overflow-x-auto whitespace-nowrap w-full pr-4 pb-1">
             {['beranda', 'generator', 'lkpd', 'soal', 'pricing', 'brankas'].map((tab) => (
-              <button key={tab} onClick={() => switchTab(tab)} className={`h-full px-1 capitalize transition-colors ${tab === 'lkpd' || tab === 'soal' ? 'hidden md:block' : ''} ${activeTab === tab ? 'text-white border-b-2 border-accent-500' : 'text-slate-400 hover:text-white'}`}>
+             <button 
+  key={tab} 
+  onClick={() => switchTab(tab)} 
+  className={`h-full px-1 capitalize transition-colors whitespace-nowrap ${activeTab === tab ? 'text-white border-b-2 border-accent-500' : 'text-slate-400 hover:text-white'}`}
+>
                 {tab === 'generator' ? 'Modul Ajar' : tab === 'soal' ? 'Soal HOTS' : tab === 'pricing' ? 'Harga' : tab === 'lkpd' ? 'LKPD' : tab === 'brankas' ? 'Brankas' : tab}
               </button>
             ))}
@@ -580,8 +584,8 @@ STRUKTUR HTML YANG WAJIB DIIKUTI:
                   <span className={`w-2 h-2 rounded-full animate-pulse ${userQuota > 0 ? 'bg-green-400' : 'bg-red-400'}`}></span> Kuota: {userQuota}
                 </span>
                 <div className="relative group z-50">
-                  <div className="w-8 h-8 rounded-full bg-brand-500 text-white flex items-center justify-center font-bold text-sm cursor-pointer border-2 border-surface_border">{currentUser.name.charAt(0)}</div>
-                  <div className="absolute right-0 mt-2 w-48 bg-surface border border-surface_border rounded-xl shadow-xl hidden group-hover:block z-50 overflow-hidden">
+  <button className="w-8 h-8 rounded-full bg-brand-500 text-white flex items-center justify-center font-bold text-sm cursor-pointer border-2 border-surface_border select-none focus:outline-none" tabIndex={0}>{currentUser.name.charAt(0)}</button>
+  <div className="absolute right-0 mt-2 w-48 bg-surface border border-surface_border rounded-xl shadow-xl hidden group-hover:block group-focus-within:block z-50 overflow-hidden">
                     <div className="p-3 border-b border-surface_border bg-slate-800/50">
                       <p className="text-sm text-white font-semibold truncate">{currentUser.name}</p>
                       <p className="text-xs text-slate-400 truncate">{currentUser.email}</p>
