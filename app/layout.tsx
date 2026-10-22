@@ -8,8 +8,24 @@ const plusJakartaSans = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "ModulGen AI",
-  description: "Generator Modul Ajar Kurikulum Merdeka",
+  title: "Modul Ajar Guru Hebat | Generator AI Kurikulum Merdeka",
+  description: "Platform AI asisten guru Indonesia. Buat Modul Ajar, RPP, LKPD, dan Soal HOTS Kurikulum Merdeka hanya dalam hitungan detik.",
+  openGraph: {
+    title: "Modul Ajar Guru Hebat - Solusi Cepat Bikin RPP",
+    description: "Lelah begadang bikin administrasi? Biarkan AI yang menyusun Modul Ajar, LKPD, dan Soal HOTS untuk Anda. Coba gratis sekarang!",
+    url: "https://modul-ajar-guru.vercel.app",
+    siteName: "Modul Ajar Guru Hebat",
+    images: [
+      {
+        url: "https://modul-ajar-guru.vercel.app/og-image.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Preview Modul Ajar Guru Hebat",
+      }
+    ],
+    locale: "id_ID",
+    type: "website",
+  }
 };
 
 export default function RootLayout({
