@@ -1270,37 +1270,102 @@ STRUKTUR HTML YANG WAJIB DIIKUTI:
         </section>
       )}
 
-      {/* HALAMAN KEBIJAKAN PRIVASI */}
+     {/* HALAMAN KEBIJAKAN PRIVASI */}
       {activeTab === 'privasi' && (
         <section className="max-w-4xl mx-auto w-full p-6 sm:p-10 mb-20 text-slate-300 animate-fade pt-8">
           <h2 className="text-3xl font-bold text-white mb-6">Kebijakan Privasi</h2>
-          <div className="space-y-6 leading-relaxed bg-surface p-8 rounded-2xl border border-surface_border">
-            <p>Terakhir diperbarui: {new Date().toLocaleDateString('id-ID')}</p>
-            <h3 className="text-xl font-semibold text-white">1. Pengumpulan Data</h3>
-            <p>Kami mengumpulkan informasi dasar saat Anda mendaftar, termasuk nama dan alamat email, semata-mata untuk keperluan pembuatan akun, pengelolaan kuota, dan sinkronisasi brankas dokumen Anda.</p>
-            <h3 className="text-xl font-semibold text-white">2. Penggunaan Teknologi AI</h3>
-            <p>Platform ini menggunakan API Google Gemini untuk menghasilkan modul ajar dan perangkat pembelajaran. Data instruksi (prompt) yang Anda masukkan akan diproses oleh AI, namun tidak digunakan untuk melatih model AI publik.</p>
-            <h3 className="text-xl font-semibold text-white">3. Keamanan Data</h3>
-            <p>Seluruh dokumen yang Anda hasilkan disimpan secara aman menggunakan sistem enkripsi standar industri (Supabase). Kami tidak membagikan, menjual, atau menyewakan data pribadi Anda kepada pihak ketiga mana pun.</p>
+          <div className="space-y-6 leading-relaxed bg-surface p-8 rounded-2xl border border-surface_border text-sm md:text-base">
+            <p className="text-slate-400 font-medium">Terakhir diperbarui: {new Date().toLocaleDateString('id-ID', {day: 'numeric', month: 'long', year: 'numeric'})}</p>
+            
+            <p><strong>Modul Ajar Guru Hebat</strong> ("kami") sangat menghargai privasi Anda. Kebijakan Privasi ini menjelaskan bagaimana kami mengumpulkan, menggunakan, menyimpan, dan melindungi data pribadi Anda saat menggunakan platform kami ("Layanan"), sebuah asisten pembuat perangkat ajar Kurikulum Merdeka berbasis Kecerdasan Buatan (AI) untuk pendidik di Indonesia.</p>
+            
+            <h3 className="text-xl font-bold text-white mt-8 mb-2">1. Data yang Kami Kumpulkan</h3>
+            <ul className="list-disc pl-5 space-y-2">
+              <li><strong>Data Akun:</strong> Nama, alamat email, dan foto profil yang Anda berikan saat mendaftar atau masuk menggunakan akun Google (Google OAuth).</li>
+              <li><strong>Konten Pembelajaran:</strong> Topik, mata pelajaran, fase/kelas, dan karakteristik siswa yang Anda ketikkan untuk menghasilkan Modul Ajar, LKPD, maupun Soal HOTS, beserta riwayat dokumen yang tersimpan di Brankas Anda.</li>
+              <li><strong>Data Transaksi & Kuota:</strong> Informasi sisa kuota (kredit) dan riwayat pembelian paket yang diproses melalui mitra *payment gateway* resmi kami. Kami tidak pernah menyimpan data kartu kredit atau PIN rekening Anda di *server* kami.</li>
+              <li><strong>Data Teknis:</strong> Alamat IP, jenis perangkat, jenis peramban (*browser*), serta data analitik dasar untuk memastikan Layanan berjalan tanpa gangguan.</li>
+            </ul>
+
+            <h3 className="text-xl font-bold text-white mt-8 mb-2">2. Cara Kami Menggunakan Data</h3>
+            <ul className="list-disc pl-5 space-y-2">
+              <li>Menyediakan, memelihara, dan memastikan kelancaran fungsionalitas Layanan.</li>
+              <li>Memproses instruksi (*prompt*) Anda melalui mesin AI untuk menghasilkan dokumen perangkat ajar yang akurat.</li>
+              <li>Mengelola sinkronisasi akun, sisa kuota, dan akses ke riwayat dokumen di Brankas Anda.</li>
+              <li>Mengirimkan pembaruan sistem, notifikasi layanan, dan dukungan pelanggan.</li>
+            </ul>
+
+            <h3 className="text-xl font-bold text-white mt-8 mb-2">3. Login Menggunakan Akun Google</h3>
+            <p>Saat Anda memilih untuk masuk menggunakan Google, kami hanya meminta akses ke informasi profil dasar Anda (nama, email, dan foto profil) sesuai dengan izin otorisasi yang Anda berikan. Kami sama sekali <strong>tidak</strong> mengakses, membaca, mengubah, atau menyimpan isi email (Gmail), kontak, Google Drive, maupun data privasi Google lainnya. Penggunaan informasi yang diterima dari Google API secara ketat mematuhi <em>Google API Services User Data Policy</em>.</p>
+
+            <h3 className="text-xl font-bold text-white mt-8 mb-2">4. Berbagi Data dengan Pihak Ketiga</h3>
+            <p>Kami tidak akan pernah menjual data pribadi Anda. Data hanya dibagikan seperlunya kepada infrastruktur pihak ketiga yang terenkripsi dan tepercaya untuk menjalankan Layanan ini:</p>
+            <ul className="list-disc pl-5 space-y-2">
+              <li><strong>Supabase:</strong> Digunakan untuk sistem autentikasi pengguna dan penyimpanan *database* (Brankas dokumen) dengan standar keamanan tinggi.</li>
+              <li><strong>Google Gemini API:</strong> Digunakan murni sebagai mesin pemroses bahasa (AI) untuk merakit naskah Modul Ajar, LKPD, dan Soal. Instruksi pembelajaran yang Anda masukkan dikirim ke server AI, namun <strong>tidak digunakan</strong> oleh Google untuk melatih model AI publik mereka.</li>
+              <li><strong>Vercel:</strong> Digunakan untuk *hosting* situs web dan manajemen *server* aplikasi.</li>
+              <li><strong>Mitra Pembayaran:</strong> Untuk memvalidasi transaksi saat Anda membeli kuota langganan (Guru Pro).</li>
+            </ul>
+
+            <h3 className="text-xl font-bold text-white mt-8 mb-2">5. Keamanan & Penyimpanan Data</h3>
+            <p>Kami menerapkan protokol keamanan teknis industri, termasuk enkripsi jalur data (HTTPS/SSL) dan perlindungan basis data berlapis. Data Anda akan disimpan selama akun Anda berstatus aktif agar Anda tetap dapat mengakses riwayat Brankas. Meskipun kami berupaya maksimal, tidak ada transmisi internet yang 100% kebal, sehingga Anda dihimbau untuk selalu menjaga kerahasiaan akses akun (email) Anda.</p>
+
+            <h3 className="text-xl font-bold text-white mt-8 mb-2">6. Hak Pengguna</h3>
+            <p>Anda memiliki kendali penuh atas data Anda. Anda berhak untuk mengakses, mengubah, mengunduh, hingga meminta penghapusan permanen akun beserta seluruh riwayat dokumen Anda dari *server* kami kapan saja.</p>
+
+            <h3 className="text-xl font-bold text-white mt-8 mb-2">7. Hubungi Kami</h3>
+            <p>Jika Anda memiliki pertanyaan, kendala, atau permintaan terkait penghapusan data privasi, silakan hubungi tim dukungan kami melalui email di <strong>support@modulajarguru.com</strong> atau WhatsApp CS di <strong>+62 812-3456-7890</strong>.</p>
           </div>
         </section>
       )}
-
       {/* HALAMAN SYARAT & KETENTUAN */}
       {activeTab === 'syarat' && (
         <section className="max-w-4xl mx-auto w-full p-6 sm:p-10 mb-20 text-slate-300 animate-fade pt-8">
-          <h2 className="text-3xl font-bold text-white mb-6">Syarat & Ketentuan</h2>
-          <div className="space-y-6 leading-relaxed bg-surface p-8 rounded-2xl border border-surface_border">
-            <h3 className="text-xl font-semibold text-white">1. Penggunaan Layanan</h3>
-            <p>Modul Ajar Guru Hebat adalah alat bantu (*asisten*) pendidikan. Pengguna bertanggung jawab penuh atas penggunaan hasil dokumen. Karena dokumen dihasilkan oleh Kecerdasan Buatan (AI), pengguna wajib meninjau, mengedit, dan memvalidasi keakuratan materi sebelum digunakan di kelas.</p>
-            <h3 className="text-xl font-semibold text-white">2. Akun dan Keamanan</h3>
-            <p>Setiap pengguna wajib menjaga kerahasiaan akun. Segala aktivitas yang terjadi di bawah akun Anda adalah tanggung jawab Anda sepenuhnya.</p>
-            <h3 className="text-xl font-semibold text-white">3. Hak Cipta Dokumen</h3>
-            <p>Dokumen (Modul, LKPD, Soal) yang Anda hasilkan melalui platform ini sepenuhnya menjadi hak milik Anda dan bebas didistribusikan untuk keperluan pendidikan sekolah Anda.</p>
+          <h2 className="text-3xl font-bold text-white mb-6">Syarat & Ketentuan Layanan</h2>
+          <div className="space-y-6 leading-relaxed bg-surface p-8 rounded-2xl border border-surface_border text-sm md:text-base">
+            <p className="text-slate-400 font-medium">Terakhir diperbarui: {new Date().toLocaleDateString('id-ID', {day: 'numeric', month: 'long', year: 'numeric'})}</p>
+            
+            <p>Selamat datang di <strong>Modul Ajar Guru Hebat</strong>. Dengan mengakses, mendaftar, atau menggunakan platform kami ("Layanan"), Anda menyetujui untuk terikat dengan Syarat & Ketentuan berikut. Jika Anda tidak menyetujui ketentuan ini, mohon untuk tidak menggunakan Layanan kami.</p>
+
+            <h3 className="text-xl font-bold text-white mt-8 mb-2">1. Tentang Layanan</h3>
+            <p>Modul Ajar Guru Hebat adalah platform berbasis Kecerdasan Buatan (AI) yang dirancang untuk membantu pendidik di Indonesia menyusun perangkat ajar (Modul Ajar/RPP, LKPD, dan Soal HOTS) berdasarkan Kurikulum Merdeka. <strong>Penting:</strong> Layanan ini ditujukan murni sebagai <em>alat bantu (asisten)</em>. Hasil dokumen yang di-<em>generate</em> oleh AI mungkin tidak selalu sempurna. Anda wajib meninjau, memvalidasi, dan menyesuaikan keakuratan materi sebelum menggunakannya di ruang kelas.</p>
+
+            <h3 className="text-xl font-bold text-white mt-8 mb-2">2. Akun & Keamanan</h3>
+            <ul className="list-disc pl-5 space-y-2">
+              <li>Anda wajib mendaftar menggunakan identitas (akun Google) yang valid.</li>
+              <li>Satu akun hanya diperuntukkan bagi penggunaan pribadi (kecuali paket instansi/Sekolah) dan dilarang keras untuk diperjualbelikan atau dipindahtangankan.</li>
+              <li>Anda bertanggung jawab penuh atas kerahasiaan akses akun Anda dan seluruh aktivitas pembuatan dokumen di dalamnya.</li>
+            </ul>
+
+            <h3 className="text-xl font-bold text-white mt-8 mb-2">3. Sistem Kuota & Langganan</h3>
+            <ul className="list-disc pl-5 space-y-2">
+              <li>Setiap kali Anda menekan tombol pemrosesan AI (Generate Dokumen), sistem akan memotong 1 (satu) kuota dari akun Anda. Membuka atau mengunduh ulang dokumen dari Brankas tidak memotong kuota.</li>
+              <li>Pengguna baru berhak mendapatkan kuota uji coba gratis. Jika habis, Anda dapat melanjutkan penggunaan dengan berlangganan paket (misal: Guru Pro) melalui metode pembayaran resmi.</li>
+              <li>Sisa kuota dari paket langganan bulanan tidak dapat diakumulasikan ke bulan berikutnya (tergantung ketentuan paket).</li>
+            </ul>
+
+            <h3 className="text-xl font-bold text-white mt-8 mb-2">4. Pembayaran & Pengembalian Dana</h3>
+            <p>Semua transaksi pembayaran diproses dengan aman melalui mitra <em>payment gateway</em> resmi kami. Karena Layanan ini berupa produk digital generatif yang kuotanya langsung masuk ke akun Anda secara *real-time*, <strong>semua pembelian bersifat final dan tidak dapat di-<em>refund</em> (dikembalikan)</strong>. Namun, jika terjadi *error* sistem (seperti pembayaran berhasil namun kuota tidak bertambah), silakan hubungi tim dukungan kami untuk penyesuaian manual.</p>
+
+            <h3 className="text-xl font-bold text-white mt-8 mb-2">5. Hak Kekayaan Intelektual (HAKI)</h3>
+            <p>Nama, logo, kode sumber (*source code*), dan desain antarmuka aplikasi Modul Ajar Guru Hebat adalah hak milik kami sepenuhnya. Namun, <strong>seluruh dokumen perangkat ajar</strong> yang berhasil Anda hasilkan (generate) menggunakan alat kami adalah <strong>sepenuhnya hak milik Anda</strong> dan bebas Anda distribusikan, cetak, atau bagikan untuk keperluan edukasi di instansi Anda.</p>
+
+            <h3 className="text-xl font-bold text-white mt-8 mb-2">6. Penggunaan yang Dilarang</h3>
+            <p>Anda secara tegas dilarang untuk:</p>
+            <ul className="list-disc pl-5 space-y-2">
+              <li>Mengeksploitasi, meretas, atau menggunakan *bot* untuk mengakali sistem pemotongan kuota atau *server* AI kami.</li>
+              <li>Menggunakan Layanan untuk menghasilkan konten yang melanggar hukum, bermuatan SARA, pornografi, atau ujaran kebencian.</li>
+              <li>Menyalin, melakukan *reverse-engineering*, atau menduplikasi sistem aplikasi untuk tujuan komersial tanpa izin tertulis.</li>
+            </ul>
+
+            <h3 className="text-xl font-bold text-white mt-8 mb-2">7. Batasan Tanggung Jawab</h3>
+            <p>Layanan kami disediakan secara "apa adanya" (<em>as is</em>). Kami tidak menjamin bahwa operasional AI akan selalu terbebas dari kesalahan, kelambatan, atau <em>server down</em> sementara. Sejauh diizinkan oleh hukum yang berlaku, kami dibebaskan dari segala tuntutan atas kerugian langsung maupun tidak langsung yang dialami pengguna akibat penggunaan hasil dokumen dari platform ini.</p>
+
+            <h3 className="text-xl font-bold text-white mt-8 mb-2">8. Hubungi Kami</h3>
+            <p>Kami berhak mengubah atau memperbarui Syarat & Ketentuan ini sewaktu-waktu guna menyesuaikan dengan perkembangan sistem. Jika Anda memiliki pertanyaan atau kendala, silakan hubungi kami melalui email <strong>support@modulajarguru.com</strong> atau WhatsApp di <strong>+62 812-3456-7890</strong>.</p>
           </div>
         </section>
       )}
-
       {/* HALAMAN HUBUNGI KAMI */}
       {activeTab === 'kontak' && (
         <section className="max-w-2xl mx-auto w-full p-6 sm:p-10 mb-20 text-slate-300 animate-fade pt-8">
