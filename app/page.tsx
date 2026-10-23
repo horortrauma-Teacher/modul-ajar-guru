@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import cpDatabase from './Data/capaian_pembelajaran.json';
 import { supabase } from "../lib/supabase";
 import Link from "next/link";
+
 export default function ModulGenApp() {
 
   // --- DATA REFERENSI ---
@@ -281,7 +282,7 @@ export default function ModulGenApp() {
     }
   };
 
- const fetchAI = async (prompt: string, docType: string) => {
+  const fetchAI = async (prompt: string, docType: string) => {
     if (!currentUser || !currentUser.email) return showSystemModal("Validasi Gagal", "Silakan login terlebih dahulu!");
     if (userQuota <= 0) return showSystemModal("Kuota Habis", "Kuota uji coba Anda telah habis. Silakan periksa paket langganan.");
     
@@ -296,7 +297,7 @@ export default function ModulGenApp() {
       setUserQuota(sisaKuotaBaru);
       localStorage.setItem('modulgen_dummy_user', JSON.stringify({ ...currentUser, quota: sisaKuotaBaru }));
 
-      // 2. Tembak ke API Route Backend kita yang aman (TIDAK LAGI TEMBAK GOOGLE LANGSUNG)
+      // 2. Tembak ke API Route Backend kita yang aman
       const response = await fetch('/api/generate', {
         method: 'POST', 
         headers: { 'Content-Type': 'application/json' },
@@ -584,8 +585,8 @@ STRUKTUR HTML YANG WAJIB DIIKUTI:
                   <span className={`w-2 h-2 rounded-full animate-pulse ${userQuota > 0 ? 'bg-green-400' : 'bg-red-400'}`}></span> Kuota: {userQuota}
                 </span>
                 <div className="relative group z-50">
-  <button className="w-8 h-8 rounded-full bg-brand-500 text-white flex items-center justify-center font-bold text-sm cursor-pointer border-2 border-surface_border select-none focus:outline-none" tabIndex={0}>{currentUser.name.charAt(0)}</button>
-  <div className="absolute right-0 mt-2 w-48 bg-surface border border-surface_border rounded-xl shadow-xl hidden group-hover:block group-focus-within:block z-50 overflow-hidden">
+                  <button className="w-8 h-8 rounded-full bg-brand-500 text-white flex items-center justify-center font-bold text-sm cursor-pointer border-2 border-surface_border select-none focus:outline-none" tabIndex={0}>{currentUser.name.charAt(0)}</button>
+                  <div className="absolute right-0 mt-2 w-48 bg-surface border border-surface_border rounded-xl shadow-xl hidden group-hover:block group-focus-within:block z-50 overflow-hidden">
                     <div className="p-3 border-b border-surface_border bg-slate-800/50">
                       <p className="text-sm text-white font-semibold truncate">{currentUser.name}</p>
                       <p className="text-xs text-slate-400 truncate">{currentUser.email}</p>
@@ -1130,8 +1131,8 @@ STRUKTUR HTML YANG WAJIB DIIKUTI:
                 </div>
 
                 <div id="exportableContentWrapper" className="overflow-auto max-h-[65vh] bg-slate-200 p-4 sm:p-8 rounded-lg w-full shadow-inner">
-  <div id="generatedContent" className="outline-none mx-auto shadow-md" contentEditable suppressContentEditableWarning style={{ backgroundColor: 'white', padding: '40px', minHeight: '800px', minWidth: '750px', maxWidth: '900px', cursor: 'text' }} dangerouslySetInnerHTML={{ __html: resultHtml }} />
-</div>
+                  <div id="generatedContent" className="outline-none mx-auto shadow-md" contentEditable suppressContentEditableWarning style={{ backgroundColor: 'white', padding: '40px', minHeight: '800px', minWidth: '750px', maxWidth: '900px', cursor: 'text' }} dangerouslySetInnerHTML={{ __html: resultHtml }} />
+                </div>
               </div>
             )}
           </div>
@@ -1268,7 +1269,60 @@ STRUKTUR HTML YANG WAJIB DIIKUTI:
           </div>
         </section>
       )}
-        {/* FOOTER */}
+
+      {/* HALAMAN KEBIJAKAN PRIVASI */}
+      {activeTab === 'privasi' && (
+        <section className="max-w-4xl mx-auto w-full p-6 sm:p-10 mb-20 text-slate-300 animate-fade pt-8">
+          <h2 className="text-3xl font-bold text-white mb-6">Kebijakan Privasi</h2>
+          <div className="space-y-6 leading-relaxed bg-surface p-8 rounded-2xl border border-surface_border">
+            <p>Terakhir diperbarui: {new Date().toLocaleDateString('id-ID')}</p>
+            <h3 className="text-xl font-semibold text-white">1. Pengumpulan Data</h3>
+            <p>Kami mengumpulkan informasi dasar saat Anda mendaftar, termasuk nama dan alamat email, semata-mata untuk keperluan pembuatan akun, pengelolaan kuota, dan sinkronisasi brankas dokumen Anda.</p>
+            <h3 className="text-xl font-semibold text-white">2. Penggunaan Teknologi AI</h3>
+            <p>Platform ini menggunakan API Google Gemini untuk menghasilkan modul ajar dan perangkat pembelajaran. Data instruksi (prompt) yang Anda masukkan akan diproses oleh AI, namun tidak digunakan untuk melatih model AI publik.</p>
+            <h3 className="text-xl font-semibold text-white">3. Keamanan Data</h3>
+            <p>Seluruh dokumen yang Anda hasilkan disimpan secara aman menggunakan sistem enkripsi standar industri (Supabase). Kami tidak membagikan, menjual, atau menyewakan data pribadi Anda kepada pihak ketiga mana pun.</p>
+          </div>
+        </section>
+      )}
+
+      {/* HALAMAN SYARAT & KETENTUAN */}
+      {activeTab === 'syarat' && (
+        <section className="max-w-4xl mx-auto w-full p-6 sm:p-10 mb-20 text-slate-300 animate-fade pt-8">
+          <h2 className="text-3xl font-bold text-white mb-6">Syarat & Ketentuan</h2>
+          <div className="space-y-6 leading-relaxed bg-surface p-8 rounded-2xl border border-surface_border">
+            <h3 className="text-xl font-semibold text-white">1. Penggunaan Layanan</h3>
+            <p>Modul Ajar Guru Hebat adalah alat bantu (*asisten*) pendidikan. Pengguna bertanggung jawab penuh atas penggunaan hasil dokumen. Karena dokumen dihasilkan oleh Kecerdasan Buatan (AI), pengguna wajib meninjau, mengedit, dan memvalidasi keakuratan materi sebelum digunakan di kelas.</p>
+            <h3 className="text-xl font-semibold text-white">2. Akun dan Keamanan</h3>
+            <p>Setiap pengguna wajib menjaga kerahasiaan akun. Segala aktivitas yang terjadi di bawah akun Anda adalah tanggung jawab Anda sepenuhnya.</p>
+            <h3 className="text-xl font-semibold text-white">3. Hak Cipta Dokumen</h3>
+            <p>Dokumen (Modul, LKPD, Soal) yang Anda hasilkan melalui platform ini sepenuhnya menjadi hak milik Anda dan bebas didistribusikan untuk keperluan pendidikan sekolah Anda.</p>
+          </div>
+        </section>
+      )}
+
+      {/* HALAMAN HUBUNGI KAMI */}
+      {activeTab === 'kontak' && (
+        <section className="max-w-2xl mx-auto w-full p-6 sm:p-10 mb-20 text-slate-300 animate-fade pt-8">
+          <h2 className="text-3xl font-bold text-white mb-6 text-center">Hubungi Kami</h2>
+          <div className="flex flex-col items-center space-y-6 bg-surface p-8 rounded-2xl border border-surface_border text-center">
+            <p className="text-lg">Ada pertanyaan, kendala, atau ingin bekerja sama? Jangan ragu untuk menghubungi tim dukungan kami.</p>
+            <div className="w-full space-y-4 mt-4">
+              <div className="bg-slate-800/50 p-4 rounded-xl border border-slate-700">
+                <p className="text-sm text-slate-400 mb-1">Email Dukungan</p>
+                <a href="mailto:support@modulajarguru.com" className="text-brand-400 font-bold text-lg hover:underline">support@modulajarguru.com</a>
+              </div>
+              <div className="bg-slate-800/50 p-4 rounded-xl border border-slate-700">
+                <p className="text-sm text-slate-400 mb-1">WhatsApp CS (Admin)</p>
+                <a href="https://wa.me/6281234567890" target="_blank" rel="noreferrer" className="text-green-400 font-bold text-lg hover:underline">+62 812-3456-7890</a>
+                <p className="text-xs text-slate-500 mt-2">Senin - Jumat (08:00 - 17:00 WIB)</p>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* FOOTER */}
       <footer className="mt-20 py-10 border-t border-surface_border bg-surface text-center">
         <div className="flex flex-col items-center justify-center gap-4 px-4">
           <div className="flex items-center gap-2 mb-2">
@@ -1281,9 +1335,9 @@ STRUKTUR HTML YANG WAJIB DIIKUTI:
           </p>
           
           <div className="flex flex-wrap justify-center gap-4 sm:gap-8 text-sm text-slate-500 mt-4 font-medium">
-            <button className="hover:text-brand-500 transition-colors">Kebijakan Privasi</button>
-            <button className="hover:text-brand-500 transition-colors">Syarat & Ketentuan</button>
-            <button className="hover:text-brand-500 transition-colors">Hubungi Kami</button>
+            <button onClick={() => switchTab('privasi')} className="hover:text-brand-500 transition-colors">Kebijakan Privasi</button>
+            <button onClick={() => switchTab('syarat')} className="hover:text-brand-500 transition-colors">Syarat & Ketentuan</button>
+            <button onClick={() => switchTab('kontak')} className="hover:text-brand-500 transition-colors">Hubungi Kami</button>
           </div>
           
           <p className="text-xs text-slate-600 mt-6">
@@ -1291,6 +1345,7 @@ STRUKTUR HTML YANG WAJIB DIIKUTI:
           </p>
         </div>
       </footer>
+
       {/* POP-UP BACA DOKUMEN (READ & EDIT) */}
       {selectedContent && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 md:p-8 animate-fade">
@@ -1311,8 +1366,8 @@ STRUKTUR HTML YANG WAJIB DIIKUTI:
             </div>
 
            <div className="p-4 sm:p-8 overflow-auto flex-1 font-sans bg-slate-200 w-full">
-  <div id="previewContent" className="outline-none mx-auto shadow-md" contentEditable suppressContentEditableWarning style={{ backgroundColor: 'white', padding: '40px', minHeight: '800px', minWidth: '750px', maxWidth: '900px', cursor: 'text' }} dangerouslySetInnerHTML={{ __html: selectedContent }} />
-</div>
+            <div id="previewContent" className="outline-none mx-auto shadow-md" contentEditable suppressContentEditableWarning style={{ backgroundColor: 'white', padding: '40px', minHeight: '800px', minWidth: '750px', maxWidth: '900px', cursor: 'text' }} dangerouslySetInnerHTML={{ __html: selectedContent }} />
+          </div>
           </div>
         </div>
       )}
@@ -1678,32 +1733,7 @@ function SimulationSection() {
           <div className="min-h-[350px]"><div className="border-l-2 border-orange-500 pl-4 mb-4">{getOutputContent()}</div></div>
           <div className="pt-6 border-t border-slate-800 mt-4"><Link href="/login" className="block w-full text-center bg-slate-800 hover:bg-slate-700 border border-slate-600 text-white font-semibold py-3 px-4 rounded-xl transition-colors group"><i className="fa-solid fa-download mr-2 text-slate-400 group-hover:text-white transition-colors"></i>Daftar Sekarang — Gratis 10 Kuota</Link></div>
         </div>
-        {/* FOOTER */}
-      <footer className="mt-20 py-10 border-t border-surface_border bg-surface text-center">
-        <div className="flex flex-col items-center justify-center gap-4 px-4">
-          <div className="flex items-center gap-2 mb-2">
-            <svg className="w-6 h-6 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
-            <h3 className="text-xl font-bold text-white">Modul Ajar Guru Hebat</h3>
-          </div>
-          
-          <p className="text-slate-400 text-sm max-w-md">
-            Platform asisten AI untuk guru Indonesia. Membantu merancang perangkat ajar, LKPD, dan soal evaluasi Kurikulum Merdeka secara otomatis dan efisien.
-          </p>
-          
-          <div className="flex flex-wrap justify-center gap-4 sm:gap-8 text-sm text-slate-500 mt-4 font-medium">
-            <button className="hover:text-brand-500 transition-colors">Kebijakan Privasi</button>
-            <button className="hover:text-brand-500 transition-colors">Syarat & Ketentuan</button>
-            <button className="hover:text-brand-500 transition-colors">Hubungi Kami</button>
-          </div>
-          
-          <p className="text-xs text-slate-600 mt-6">
-            © {new Date().getFullYear()} Modul Ajar Guru Hebat. Dibuat dengan ❤️ untuk Pendidikan Indonesia.
-          </p>
-        </div>
-      </footer>
       </div>
-    
     </section>
-    
   );
 }
