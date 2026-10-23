@@ -1437,8 +1437,8 @@ STRUKTUR HTML YANG WAJIB DIIKUTI:
             <div>
               <h4 className="text-white font-bold mb-6 text-lg tracking-wide">Bantuan</h4>
               <ul className="space-y-4 text-sm font-medium">
-                <li><button className="text-slate-400 hover:text-orange-400 transition-colors text-left w-full">Panduan Penggunaan</button></li>
-                <li><button className="text-slate-400 hover:text-orange-400 transition-colors text-left w-full">Tanya Jawab (FAQ)</button></li>
+               <li><button onClick={() => { switchTab('beranda'); setTimeout(() => document.getElementById('panduan')?.scrollIntoView({behavior: 'smooth'}), 100); }} className="text-slate-400 hover:text-orange-400 transition-colors text-left w-full">Panduan Penggunaan</button></li>
+<li><button onClick={() => { switchTab('beranda'); setTimeout(() => document.getElementById('faq')?.scrollIntoView({behavior: 'smooth'}), 100); }} className="text-slate-400 hover:text-orange-400 transition-colors text-left w-full">Tanya Jawab (FAQ)</button></li>
                 <li><button onClick={() => switchTab('kontak')} className="text-slate-400 hover:text-orange-400 transition-colors text-left w-full">Hubungi Kami</button></li>
                 <li><button onClick={() => switchTab('privasi')} className="text-slate-400 hover:text-orange-400 transition-colors text-left w-full">Kebijakan Privasi</button></li>
                 <li><button onClick={() => switchTab('syarat')} className="text-slate-400 hover:text-orange-400 transition-colors text-left w-full">Syarat & Ketentuan</button></li>
@@ -1578,7 +1578,7 @@ function FAQSection() {
   ];
 
   return (
-    <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-20 mt-10 border-t border-slate-700/50 relative z-10">
+    <section id="faq" className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-20 mt-10 border-t border-slate-700/50 relative z-10">
       <div className="text-center mb-12">
         <h2 className="text-3xl md:text-4xl font-bold text-white mb-4 drop-shadow-md">Pertanyaan Seputar Modul Ajar Guru Hebat</h2>
         <p className="text-slate-400 text-sm md:text-base max-w-2xl mx-auto">
@@ -1742,7 +1742,7 @@ function HowItWorksSection() {
   ];
 
   return (
-    <section ref={sectionRef} className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-20 relative z-10 border-t border-slate-700/50 mt-10">
+    <section id="panduan" ref={sectionRef} className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-20 relative z-10 border-t border-slate-700/50 mt-10">
       <div className={`mb-12 transition-all duration-1000 transform ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'}`}>
         <div className="inline-block px-3 py-1 bg-blue-500/10 text-blue-400 text-xs font-bold tracking-wider rounded-full mb-4 uppercase border border-blue-500/20">Cara Kerja</div>
         <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-4 tracking-tight">Tiga langkah mudah,<br className="hidden md:block" /> tanpa keahlian khusus.</h2>
