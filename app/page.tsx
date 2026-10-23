@@ -668,29 +668,7 @@ STRUKTUR HTML YANG WAJIB DIIKUTI:
           </>
           
         )}
-  {/* FOOTER */}
-      <footer className="mt-20 py-10 border-t border-surface_border bg-surface text-center">
-        <div className="flex flex-col items-center justify-center gap-4 px-4">
-          <div className="flex items-center gap-2 mb-2">
-            <svg className="w-6 h-6 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
-            <h3 className="text-xl font-bold text-white">Modul Ajar Guru Hebat</h3>
-          </div>
-          
-          <p className="text-slate-400 text-sm max-w-md">
-            Platform asisten AI untuk guru Indonesia. Membantu merancang perangkat ajar, LKPD, dan soal evaluasi Kurikulum Merdeka secara otomatis dan efisien.
-          </p>
-          
-          <div className="flex flex-wrap justify-center gap-4 sm:gap-8 text-sm text-slate-500 mt-4 font-medium">
-            <button className="hover:text-brand-500 transition-colors">Kebijakan Privasi</button>
-            <button className="hover:text-brand-500 transition-colors">Syarat & Ketentuan</button>
-            <button className="hover:text-brand-500 transition-colors">Hubungi Kami</button>
-          </div>
-          
-          <p className="text-xs text-slate-600 mt-6">
-            © {new Date().getFullYear()} Modul Ajar Guru Hebat. Dibuat dengan ❤️ untuk Pendidikan Indonesia.
-          </p>
-        </div>
-      </footer>
+  
         {/* HALAMAN PRICING */}
         {activeTab === 'pricing' && (
           <section className="animate-fade max-w-5xl mx-auto pt-8 pb-12">
@@ -1677,6 +1655,29 @@ function SimulationSection() {
           <div className="min-h-[350px]"><div className="border-l-2 border-orange-500 pl-4 mb-4">{getOutputContent()}</div></div>
           <div className="pt-6 border-t border-slate-800 mt-4"><Link href="/login" className="block w-full text-center bg-slate-800 hover:bg-slate-700 border border-slate-600 text-white font-semibold py-3 px-4 rounded-xl transition-colors group"><i className="fa-solid fa-download mr-2 text-slate-400 group-hover:text-white transition-colors"></i>Daftar Sekarang — Gratis 10 Kuota</Link></div>
         </div>
+        {/* FOOTER */}
+      <footer className="mt-20 py-10 border-t border-surface_border bg-surface text-center">
+        <div className="flex flex-col items-center justify-center gap-4 px-4">
+          <div className="flex items-center gap-2 mb-2">
+            <svg className="w-6 h-6 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
+            <h3 className="text-xl font-bold text-white">Modul Ajar Guru Hebat</h3>
+          </div>
+          
+          <p className="text-slate-400 text-sm max-w-md">
+            Platform asisten AI untuk guru Indonesia. Membantu merancang perangkat ajar, LKPD, dan soal evaluasi Kurikulum Merdeka secara otomatis dan efisien.
+          </p>
+          
+          <div className="flex flex-wrap justify-center gap-4 sm:gap-8 text-sm text-slate-500 mt-4 font-medium">
+            <button className="hover:text-brand-500 transition-colors">Kebijakan Privasi</button>
+            <button className="hover:text-brand-500 transition-colors">Syarat & Ketentuan</button>
+            <button className="hover:text-brand-500 transition-colors">Hubungi Kami</button>
+          </div>
+          
+          <p className="text-xs text-slate-600 mt-6">
+            © {new Date().getFullYear()} Modul Ajar Guru Hebat. Dibuat dengan ❤️ untuk Pendidikan Indonesia.
+          </p>
+        </div>
+      </footer>
       </div>
     
     </section>
