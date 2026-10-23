@@ -1387,30 +1387,76 @@ STRUKTUR HTML YANG WAJIB DIIKUTI:
         </section>
       )}
 
-      {/* FOOTER */}
-      <footer className="mt-20 py-10 border-t border-surface_border bg-surface text-center">
-        <div className="flex flex-col items-center justify-center gap-4 px-4">
-          <div className="flex items-center gap-2 mb-2">
-            <svg className="w-6 h-6 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
-            <h3 className="text-xl font-bold text-white">Modul Ajar Guru Hebat</h3>
+    {/* FOOTER MODERN MULTI-KOLOM */}
+      <footer className="mt-20 pt-16 pb-8 border-t border-surface_border bg-surface relative z-10">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
+            
+            {/* Kolom 1: Brand & Deskripsi */}
+            <div className="lg:col-span-1">
+              <div className="flex items-center gap-2 mb-4">
+                <svg className="w-7 h-7 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
+                <h3 className="text-xl font-extrabold text-white tracking-tight">Modul Ajar<br/>Guru Hebat</h3>
+              </div>
+              <p className="text-slate-400 text-sm mb-6 leading-relaxed">
+                Aplikasi asisten AI cerdas untuk membantu guru di Indonesia merancang administrasi pembelajaran Kurikulum Merdeka dengan cepat dan presisi.
+              </p>
+              <div className="flex gap-3">
+                <button className="w-10 h-10 rounded-xl border border-slate-700 bg-slate-800/50 flex items-center justify-center text-slate-400 hover:text-white hover:border-orange-500 hover:bg-orange-500/10 transition-all"><i className="fa-brands fa-facebook-f"></i></button>
+                <button className="w-10 h-10 rounded-xl border border-slate-700 bg-slate-800/50 flex items-center justify-center text-slate-400 hover:text-white hover:border-orange-500 hover:bg-orange-500/10 transition-all"><i className="fa-brands fa-instagram"></i></button>
+                <button className="w-10 h-10 rounded-xl border border-slate-700 bg-slate-800/50 flex items-center justify-center text-slate-400 hover:text-white hover:border-orange-500 hover:bg-orange-500/10 transition-all"><i className="fa-brands fa-youtube"></i></button>
+              </div>
+            </div>
+
+            {/* Kolom 2: Produk Utama */}
+            <div>
+              <h4 className="text-white font-bold mb-6 text-lg tracking-wide">Produk AI</h4>
+              <ul className="space-y-4 text-sm font-medium">
+                <li><button onClick={() => switchTab('generator')} className="text-slate-400 hover:text-orange-400 transition-colors text-left w-full">Modul Ajar (RPP)</button></li>
+                <li><button onClick={() => switchTab('soal')} className="text-slate-400 hover:text-orange-400 transition-colors text-left w-full">Bank Soal HOTS</button></li>
+                <li><button onClick={() => switchTab('lkpd')} className="text-slate-400 hover:text-orange-400 transition-colors text-left w-full">LKPD Interaktif</button></li>
+                <li><button onClick={() => switchTab('brankas')} className="text-slate-400 hover:text-orange-400 transition-colors text-left w-full">Brankas Dokumen</button></li>
+                <li className="flex items-center gap-2 text-slate-600 cursor-not-allowed">Prota & Promes <span className="text-[9px] bg-slate-800/80 border border-slate-700 px-2 py-0.5 rounded text-slate-400 uppercase font-bold tracking-wider">Segera</span></li>
+                <li className="flex items-center gap-2 text-slate-600 cursor-not-allowed">Komentar Rapor <span className="text-[9px] bg-slate-800/80 border border-slate-700 px-2 py-0.5 rounded text-slate-400 uppercase font-bold tracking-wider">Segera</span></li>
+              </ul>
+            </div>
+
+            {/* Kolom 3: Perusahaan & Navigasi */}
+            <div>
+              <h4 className="text-white font-bold mb-6 text-lg tracking-wide">Perusahaan</h4>
+              <ul className="space-y-4 text-sm font-medium">
+                <li><button onClick={() => switchTab('beranda')} className="text-slate-400 hover:text-orange-400 transition-colors text-left w-full">Beranda Utama</button></li>
+                <li><button onClick={() => switchTab('pricing')} className="text-slate-400 hover:text-orange-400 transition-colors text-left w-full">Harga & Langganan</button></li>
+                <li><button className="text-slate-400 hover:text-orange-400 transition-colors text-left w-full">Tentang Kami</button></li>
+                <li><button className="text-slate-400 hover:text-orange-400 transition-colors text-left w-full">Blog Pendidikan</button></li>
+                <li><button className="text-slate-400 hover:text-orange-400 transition-colors text-left w-full">Ekosistem Guru</button></li>
+              </ul>
+            </div>
+
+            {/* Kolom 4: Bantuan & Legal */}
+            <div>
+              <h4 className="text-white font-bold mb-6 text-lg tracking-wide">Bantuan</h4>
+              <ul className="space-y-4 text-sm font-medium">
+                <li><button className="text-slate-400 hover:text-orange-400 transition-colors text-left w-full">Panduan Penggunaan</button></li>
+                <li><button className="text-slate-400 hover:text-orange-400 transition-colors text-left w-full">Tanya Jawab (FAQ)</button></li>
+                <li><button onClick={() => switchTab('kontak')} className="text-slate-400 hover:text-orange-400 transition-colors text-left w-full">Hubungi Kami</button></li>
+                <li><button onClick={() => switchTab('privasi')} className="text-slate-400 hover:text-orange-400 transition-colors text-left w-full">Kebijakan Privasi</button></li>
+                <li><button onClick={() => switchTab('syarat')} className="text-slate-400 hover:text-orange-400 transition-colors text-left w-full">Syarat & Ketentuan</button></li>
+              </ul>
+            </div>
           </div>
-          
-          <p className="text-slate-400 text-sm max-w-md">
-            Platform asisten AI untuk guru Indonesia. Membantu merancang perangkat ajar, LKPD, dan soal evaluasi Kurikulum Merdeka secara otomatis dan efisien.
-          </p>
-          
-          <div className="flex flex-wrap justify-center gap-4 sm:gap-8 text-sm text-slate-500 mt-4 font-medium">
-            <button onClick={() => switchTab('privasi')} className="hover:text-brand-500 transition-colors">Kebijakan Privasi</button>
-            <button onClick={() => switchTab('syarat')} className="hover:text-brand-500 transition-colors">Syarat & Ketentuan</button>
-            <button onClick={() => switchTab('kontak')} className="hover:text-brand-500 transition-colors">Hubungi Kami</button>
+
+          {/* Copyright Area */}
+          <div className="pt-8 border-t border-slate-700/50 flex flex-col md:flex-row items-center justify-between gap-4">
+            <p className="text-xs text-slate-500 font-medium">
+              © {new Date().getFullYear()} Modul Ajar Guru Hebat. Dibuat dengan ❤️ untuk Pendidikan Indonesia.
+            </p>
+            <div className="flex gap-4 text-xs text-slate-500 font-semibold uppercase tracking-wider">
+               <span>Inovasi Pembelajaran Digital</span>
+            </div>
           </div>
-          
-          <p className="text-xs text-slate-600 mt-6">
-            © {new Date().getFullYear()} Modul Ajar Guru Hebat. Dibuat dengan ❤️ untuk Pendidikan Indonesia.
-          </p>
         </div>
       </footer>
-
       {/* POP-UP BACA DOKUMEN (READ & EDIT) */}
       {selectedContent && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 md:p-8 animate-fade">
