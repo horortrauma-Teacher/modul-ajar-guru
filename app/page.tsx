@@ -1538,6 +1538,7 @@ STRUKTUR HTML YANG WAJIB DIIKUTI:
                 <li><button onClick={() => switchTab('tentang kami')} className="text-slate-400 hover:text-orange-400 transition-colors text-left w-full">Tentang Kami</button></li>
                 <li><button onClick={() => switchTab('blog')} className="text-slate-400 hover:text-orange-400 transition-colors text-left w-full">Blog Pendidikan</button></li>
                 <li className="flex items-center gap-2 text-slate-600 cursor-not-allowed">Ekosistem Guru <span className="text-[9px] bg-slate-800/80 border border-slate-700 px-2 py-0.5 rounded text-slate-400 uppercase font-bold tracking-wider">Segera</span></li>
+                <li className="flex items-center gap-2 text-slate-600 cursor-not-allowed">Latihan Soal CBT <span className="text-[9px] bg-slate-800/80 border border-slate-700 px-2 py-0.5 rounded text-slate-400 uppercase font-bold tracking-wider">Segera</span></li>
               </ul>
             </div>
 
