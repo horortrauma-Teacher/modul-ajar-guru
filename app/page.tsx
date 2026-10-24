@@ -598,29 +598,31 @@ STRUKTUR HTML YANG WAJIB DIIKUTI:
 
   return (
     <div className="bg-background text-slate-200 font-sans antialiased min-h-screen selection:bg-brand-500/30 flex flex-col relative">
-      <nav className="fixed top-0 left-0 right-0 z-40 bg-background/90 backdrop-blur-md border-b border-surface_border transition-all">
+     <nav className="fixed top-0 left-0 right-0 z-40 bg-background/90 backdrop-blur-md border-b border-surface_border transition-all">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2 cursor-pointer" onClick={() => switchTab('beranda')}>
             <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 text-brand-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z" /><path d="M2 17l10 5 10-5" /><path d="M2 12l10 5 10-5" /></svg>
             <span className="text-white font-bold text-lg tracking-tight hidden sm:block">Modul Ajar Guru Hebat</span>
             <span className="bg-gradient-to-r from-accent-500 to-amber-500 text-[10px] font-bold px-1.5 py-0.5 rounded text-white uppercase tracking-wider ml-1 shadow-sm">PRO</span>
           </div>
-        <div className="flex items-center gap-6 md:gap-10 md:ml-12 overflow-x-auto whitespace-nowrap w-full pr-4 pb-2 md:pb-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-            {['beranda', 'generator', 'lkpd', 'soal', 'pricing', 'brankas'].map((tab) => (
+
+        <div className="flex items-center gap-3 md:gap-5 md:ml-6 overflow-x-auto whitespace-nowrap w-full pb-1 [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-slate-700 hover:[&::-webkit-scrollbar-thumb]:bg-slate-500 [&::-webkit-scrollbar-thumb]:rounded-full">
+            {['beranda', 'generator', 'lkpd', 'soal', 'pricing', 'brankas', 'tentang kami', 'blog'].map((tab) => (
               <button
                 key={tab}
                 onClick={() => switchTab(tab)}
-                className={`h-full px-3 md:px-4 capitalize transition-colors whitespace-nowrap ... ${activeTab === tab ? 'text-white border-b-2 border-accent-500' : 'text-slate-400 hover:text-white'}`}
+                className={`h-full px-2 md:px-3 text-sm capitalize transition-colors whitespace-nowrap ${activeTab === tab ? 'text-white border-b-2 border-orange-500 font-bold' : 'text-slate-400 hover:text-white font-medium'}`}
               >
-                {tab === 'generator' ? 'Modul Ajar' : tab === 'soal' ? 'Soal HOTS' : tab === 'pricing' ? 'Harga' : tab === 'lkpd' ? 'LKPD' : tab === 'brankas' ? 'Brankas' : tab}
+                {tab === 'generator' ? 'Modul Ajar' : tab === 'soal' ? 'Soal HOTS' : tab === 'pricing' ? 'Harga' : tab === 'lkpd' ? 'LKPD' : tab === 'brankas' ? 'Brankas' : tab === 'tentang kami' ? 'Tentang Kami' : tab}
               </button>
             ))}
           </div>
+
           <div className="flex items-center gap-3">
             {!currentUser ? (
              <button onClick={handleLoginGoogle} className="bg-white text-gray-900 flex items-center gap-2 text-xs md:text-sm font-bold py-1.5 px-3 md:px-4 rounded-full border border-gray-200 shadow-sm hover:bg-slate-100 transition-colors">
-  <i className="fa-brands fa-google text-orange-500"></i> Masuk
-</button>
+                <i className="fa-brands fa-google text-orange-500"></i> Masuk
+              </button>
             ) : (
               <div className="flex items-center gap-3">
                 <span className="text-[11px] font-bold text-slate-300 hidden md:flex items-center gap-1.5 bg-surface px-3 py-1.5 rounded-full border border-surface_border shadow-inner">
@@ -634,8 +636,8 @@ STRUKTUR HTML YANG WAJIB DIIKUTI:
                       <p className="text-xs text-slate-400 truncate">{currentUser.email}</p>
                     </div>
                    <button onClick={handleLogout} className="w-full text-left flex items-center gap-2 px-4 py-3 text-sm text-red-400 hover:bg-surface_border transition-colors font-medium border-t border-surface_border">
-  <i className="fa-solid fa-arrow-right-from-bracket"></i> Keluar
-</button>
+                      <i className="fa-solid fa-arrow-right-from-bracket"></i> Keluar
+                    </button>
                   </div>
                 </div>
               </div>
@@ -1309,7 +1311,73 @@ STRUKTUR HTML YANG WAJIB DIIKUTI:
           </div>
         </section>
       )}
+{/* HALAMAN TENTANG KAMI */}
+        {activeTab === 'tentang kami' && (
+          <section className="animate-fade max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-20">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+              {/* Kolom Gambar AI */}
+              <div className="relative rounded-3xl overflow-hidden shadow-[0_0_30px_rgba(249,115,22,0.15)] border-4 border-slate-800 bg-slate-900 p-2">
+                <img 
+                  src="/Gemini_Generated_Image_jn5dzjjn5dzjjn5d.jpg" 
+                  alt="Guru Indonesia" 
+                  className="w-full h-auto rounded-2xl object-cover"
+                />
+              </div>
 
+              {/* Kolom Teks & Fitur */}
+              <div>
+                <span className="text-xs font-bold text-orange-400 bg-orange-500/10 px-3 py-1 rounded-full mb-4 inline-block border border-orange-500/20">
+                  TENTANG KAMI
+                </span>
+                <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-4 leading-tight">
+                  Dibuat guru, untuk guru Indonesia
+                </h2>
+                <p className="text-slate-400 mb-8 text-base md:text-lg leading-relaxed">
+                  Modul Ajar Guru Hebat lahir dari pengalaman langsung para guru Indonesia yang memahami betapa terbatasnya waktu untuk membuat administrasi pembelajaran.
+                </p>
+
+                <div className="space-y-4">
+                  <div className="flex gap-4 p-5 bg-slate-800/50 rounded-2xl border border-slate-700 shadow-sm hover:border-slate-500 transition-colors">
+                    <div className="bg-slate-900 p-3 rounded-xl border border-slate-700 h-fit">
+                      <i className="fa-solid fa-book-open text-orange-400 text-xl"></i>
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-slate-200">Sesuai Kurikulum Merdeka</h3>
+                      <p className="text-sm text-slate-400 mt-1">Menggunakan model pembelajaran dan Dimensi Profil Lulusan sesuai standar Kemendikbudristek.</p>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-4 p-5 bg-slate-800/50 rounded-2xl border border-slate-700 shadow-sm hover:border-slate-500 transition-colors">
+                    <div className="bg-slate-900 p-3 rounded-xl border border-slate-700 h-fit">
+                      <i className="fa-solid fa-microchip text-orange-400 text-xl"></i>
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-slate-200">AI terlatih untuk pendidikan Indonesia</h3>
+                      <p className="text-sm text-slate-400 mt-1">Di-train dengan ribuan modul ajar berkualitas dari guru-guru terbaik Indonesia.</p>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-4 p-5 bg-slate-800/50 rounded-2xl border border-slate-700 shadow-sm hover:border-slate-500 transition-colors">
+                    <div className="bg-slate-900 p-3 rounded-xl border border-slate-700 h-fit">
+                      <i className="fa-solid fa-bolt text-orange-400 text-xl"></i>
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-slate-200">Hemat waktu & biaya</h3>
+                      <p className="text-sm text-slate-400 mt-1">Buat modul ajar lengkap hanya dalam 3 menit, bukan 3 jam.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* HALAMAN BLOG */}
+        {activeTab === 'blog' && (
+          <section className="animate-fade w-full pt-8 pb-20">
+            <ArticleSection />
+          </section>
+        )}
      {/* HALAMAN KEBIJAKAN PRIVASI */}
       {activeTab === 'privasi' && (
         <section className="max-w-4xl mx-auto w-full p-6 sm:p-10 mb-20 text-slate-300 animate-fade pt-8">
@@ -1527,28 +1595,33 @@ STRUKTUR HTML YANG WAJIB DIIKUTI:
 }
 
 function ArticleSection() {
-  const [articles, setArticles] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function fetchArticles() {
-      const { data, error } = await supabase
-        .from('articles')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .limit(3); 
-
-      if (!error && data) {
-        setArticles(data);
-      }
-      setLoading(false);
+  const articles = [
+    {
+      kategori: "KURIKULUM",
+      tanggal: "21 Okt 2026",
+      judul: "Panduan Cepat Menyusun Modul Ajar Kurikulum Merdeka",
+      deskripsi: "Lelah begadang menyusun RPP? Pelajari cara praktis merumuskan CP, TP, dan P5 menjadi Modul Ajar lengkap dan komprehensif.",
+      gambar: "/Panduan.jpg" // Kiri (Gambar tetap)
+    },
+    {
+      kategori: "PRAKTIKUM & METODE",
+      tanggal: "21 Okt 2026",
+      judul: "Merancang LKPD Interaktif: Rahasia Kelas Aktif",
+      deskripsi: "LKPD yang baik bukan sekadar kumpulan soal. Temukan cara membuat Lembar Kerja Peserta Didik berbasis proyek dan inkuiri yang menyenangkan.",
+      gambar: "/LKPD.jpg" // Tengah
+    },
+    {
+      kategori: "EVALUASI & ASESMEN",
+      tanggal: "21 Okt 2026",
+      judul: "Rahasia Menyusun Soal HOTS yang Valid dan Efektif",
+      deskripsi: "Panduan menyusun soal HOTS literasi dan numerasi berbasis Taksonomi Bloom. Dilengkapi cara membuat kisi-kisi dan rubrik penilaian yang akurat.",
+      gambar: "/Hots.jpg" // Kanan
     }
-    fetchArticles();
-  }, []);
+  ];
 
   return (
-    <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-24 relative z-10 border-t border-slate-700/50">
-      <div className="flex flex-col md:flex-row justify-between items-end mb-12">
+    <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 relative z-10 border-t border-slate-700/50">
+      <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-4">
         <div className="max-w-2xl">
           <div className="inline-block px-4 py-1.5 bg-blue-500/10 text-blue-400 text-sm font-semibold rounded-full mb-4 border border-blue-500/20">
             <i className="fa-solid fa-newspaper mr-2"></i> Artikel & Wawasan
@@ -1556,41 +1629,36 @@ function ArticleSection() {
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Ruang Belajar Pendidik</h2>
           <p className="text-slate-400 text-sm md:text-base">Temukan berbagai tips, trik, dan panduan seputar implementasi Kurikulum Merdeka dan pemanfaatan AI dalam pendidikan.</p>
         </div>
-        <button className="hidden md:block px-6 py-2.5 bg-slate-800 hover:bg-slate-700 text-white rounded-full text-sm font-semibold transition-colors border border-slate-600">
+        <button className="px-6 py-2.5 bg-slate-800 hover:bg-slate-700 text-white rounded-full text-sm font-semibold transition-colors border border-slate-600 whitespace-nowrap">
           Lihat Semua Artikel
         </button>
       </div>
 
-      {loading ? (
-         <div className="text-center py-10 text-slate-400">Memuat artikel...</div>
-      ) : articles.length === 0 ? (
-         <div className="text-center py-10 text-slate-400">Belum ada artikel.</div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {articles.map((art, idx) => (
-            <Link href={`/artikel/${art.slug}`} key={idx} className="bg-slate-900 border border-slate-700 rounded-3xl overflow-hidden group hover:border-slate-500 transition-all duration-300 hover:shadow-[0_0_20px_rgba(59,130,246,0.1)] flex flex-col">
-              <div className="h-48 overflow-hidden relative">
-                <div className="absolute top-4 left-4 z-10 bg-slate-900/80 backdrop-blur text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider border border-slate-600">
-                  {art.category}
-                </div>
-                <img src={art.image_url} alt={art.title} className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700" />
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        {articles.map((art, idx) => (
+          <div key={idx} className="bg-slate-900 border border-slate-700 rounded-3xl overflow-hidden group hover:border-slate-500 transition-all duration-300 hover:shadow-[0_0_20px_rgba(59,130,246,0.1)] flex flex-col cursor-pointer">
+            <div className="h-48 overflow-hidden relative">
+              <div className="absolute top-4 left-4 z-10 bg-slate-900/80 backdrop-blur text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider border border-slate-600">
+                {art.kategori}
               </div>
-              <div className="p-6 flex-grow flex flex-col">
-                <div className="text-slate-500 text-xs mb-3 font-medium"><i className="fa-regular fa-calendar mr-2"></i>{new Date(art.created_at).toLocaleDateString('id-ID', {day: 'numeric', month: 'short', year: 'numeric'})}</div>
-                <h3 className="text-xl font-bold text-slate-200 mb-3 group-hover:text-blue-400 transition-colors line-clamp-2">{art.title}</h3>
-                <p className="text-slate-400 text-sm leading-relaxed mb-6 line-clamp-3">{art.description}</p>
-                <div className="mt-auto font-semibold text-blue-500 text-sm group-hover:text-blue-400 flex items-center cursor-pointer">
-                  Baca Selengkapnya <i className="fa-solid fa-arrow-right ml-2 transform group-hover:translate-x-1 transition-transform"></i>
-                </div>
+              <img src={art.gambar} alt={art.judul} className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700" />
+            </div>
+            <div className="p-6 flex-grow flex flex-col">
+              <div className="text-slate-500 text-xs mb-3 font-medium flex items-center gap-2">
+                <i className="fa-regular fa-calendar"></i> {art.tanggal}
               </div>
-            </Link>
-          ))}
-        </div>
-      )}
+              <h3 className="text-xl font-bold text-slate-200 mb-3 group-hover:text-blue-400 transition-colors line-clamp-2">{art.judul}</h3>
+              <p className="text-slate-400 text-sm leading-relaxed mb-6 line-clamp-3">{art.deskripsi}</p>
+              <div className="mt-auto font-semibold text-blue-500 text-sm group-hover:text-blue-400 flex items-center">
+                Baca Selengkapnya <i className="fa-solid fa-arrow-right ml-2 transform group-hover:translate-x-1 transition-transform"></i>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
     </section>
   );
 }
-
 function FAQSection() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
