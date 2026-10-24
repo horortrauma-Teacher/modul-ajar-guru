@@ -1529,15 +1529,15 @@ STRUKTUR HTML YANG WAJIB DIIKUTI:
               </ul>
             </div>
 
-            {/* Kolom 3: Perusahaan & Navigasi */}
+           {/* Kolom 3: Perusahaan & Navigasi */}
             <div>
               <h4 className="text-white font-bold mb-6 text-lg tracking-wide">Perusahaan</h4>
               <ul className="space-y-4 text-sm font-medium">
                 <li><button onClick={() => switchTab('beranda')} className="text-slate-400 hover:text-orange-400 transition-colors text-left w-full">Beranda Utama</button></li>
                 <li><button onClick={() => switchTab('pricing')} className="text-slate-400 hover:text-orange-400 transition-colors text-left w-full">Harga & Langganan</button></li>
-                <li><button className="text-slate-400 hover:text-orange-400 transition-colors text-left w-full">Tentang Kami</button></li>
-                <li><button className="text-slate-400 hover:text-orange-400 transition-colors text-left w-full">Blog Pendidikan</button></li>
-                <li><button className="text-slate-400 hover:text-orange-400 transition-colors text-left w-full">Ekosistem Guru</button></li>
+                <li><button onClick={() => switchTab('tentang kami')} className="text-slate-400 hover:text-orange-400 transition-colors text-left w-full">Tentang Kami</button></li>
+                <li><button onClick={() => switchTab('blog')} className="text-slate-400 hover:text-orange-400 transition-colors text-left w-full">Blog Pendidikan</button></li>
+                <li className="flex items-center gap-2 text-slate-600 cursor-not-allowed">Ekosistem Guru <span className="text-[9px] bg-slate-800/80 border border-slate-700 px-2 py-0.5 rounded text-slate-400 uppercase font-bold tracking-wider">Segera</span></li>
               </ul>
             </div>
 
