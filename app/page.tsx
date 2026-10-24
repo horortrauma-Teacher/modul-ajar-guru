@@ -252,14 +252,56 @@ export default function ModulGenApp() {
     setShowCpModal(false);
   };
 
-  useEffect(() => {
-    const savedSession = localStorage.getItem('modulgen_dummy_user');
-    if (savedSession) {
-      const parsedSession = JSON.parse(savedSession);
-      setCurrentUser({ name: parsedSession.name, email: parsedSession.email });
-      setUserQuota(parsedSession.quota);
+  // 1. Fungsi penarik kuota dari Database Supabase
+  const fetchUserQuota = async (email: string) => {
+    const { data, error } = await supabase.from('users').select('quota').eq('email', email).single();
+    if (data) {
+      setUserQuota(data.quota);
+    } else {
+      // Jika user baru pertama kali login, buatkan data di tabel dan beri 10 kuota gratis
+      const { error: insertError } = await supabase.from('users').insert([{ email: email, quota: 10 }]);
+      if (!insertError) setUserQuota(10);
     }
+  };
+
+  // 2. Pendeteksi status Login Google (Otomatis jalan saat web dibuka)
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user?.email) {
+        setCurrentUser({ 
+          name: session.user.user_metadata.full_name || session.user.email.split('@')[0], 
+          email: session.user.email 
+        });
+        fetchUserQuota(session.user.email);
+      }
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user?.email) {
+        setCurrentUser({ name: session.user.user_metadata.full_name || session.user.email.split('@')[0], email: session.user.email });
+        fetchUserQuota(session.user.email);
+      } else {
+        setCurrentUser(null);
+        setUserQuota(0);
+      }
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
+
+  // 3. Tombol Eksekutor Google Login & Logout
+  const handleLoginGoogle = async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: window.location.origin }
+    });
+    if (error) showSystemModal("Gagal Login", error.message);
+  };
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    switchTab('beranda');
+  };
 
   const showSystemModal = (title: string, message: string) => setModal({ isOpen: true, title, message });
   const switchTab = (tab: string) => { setActiveTab(tab); setGenState('A'); window.scrollTo({ top: 0, behavior: 'smooth' }); if (tab === 'brankas') ambilDataBrankas(); };
@@ -576,9 +618,9 @@ STRUKTUR HTML YANG WAJIB DIIKUTI:
           </div>
           <div className="flex items-center gap-3">
             {!currentUser ? (
-              <Link href="/login" className="bg-white text-gray-900 text-xs md:text-sm font-bold py-1.5 px-3 md:px-4 rounded-full border border-gray-200 shadow-sm hover:bg-slate-100 transition-colors">
-                Masuk / Daftar
-              </Link>
+             <button onClick={handleLoginGoogle} className="bg-white text-gray-900 flex items-center gap-2 text-xs md:text-sm font-bold py-1.5 px-3 md:px-4 rounded-full border border-gray-200 shadow-sm hover:bg-slate-100 transition-colors">
+  <i className="fa-brands fa-google text-orange-500"></i> Masuk
+</button>
             ) : (
               <div className="flex items-center gap-3">
                 <span className="text-[11px] font-bold text-slate-300 hidden md:flex items-center gap-1.5 bg-surface px-3 py-1.5 rounded-full border border-surface_border shadow-inner">
@@ -591,11 +633,9 @@ STRUKTUR HTML YANG WAJIB DIIKUTI:
                       <p className="text-sm text-white font-semibold truncate">{currentUser.name}</p>
                       <p className="text-xs text-slate-400 truncate">{currentUser.email}</p>
                     </div>
-                    <button onClick={() => {
-                      setCurrentUser(null);
-                      localStorage.removeItem('modulgen_dummy_user');
-                      switchTab('beranda');
-                    }} className="w-full text-left px-4 py-3 text-sm text-red-400 hover:bg-surface_border transition-colors font-medium border-t border-surface_border">Keluar</button>
+                   <button onClick={handleLogout} className="w-full text-left flex items-center gap-2 px-4 py-3 text-sm text-red-400 hover:bg-surface_border transition-colors font-medium border-t border-surface_border">
+  <i className="fa-solid fa-arrow-right-from-bracket"></i> Keluar
+</button>
                   </div>
                 </div>
               </div>
