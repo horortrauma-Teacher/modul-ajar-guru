@@ -728,7 +728,13 @@ STRUKTUR HTML YANG WAJIB DIIKUTI:
                   <li className="flex items-start text-slate-300 text-sm"><i className="fa-solid fa-check text-green-500 mt-1 mr-3"></i> 3x Kuota Generate AI</li>
                   <li className="flex items-start text-slate-300 text-sm"><i className="fa-solid fa-check text-green-500 mt-1 mr-3"></i> Akses Modul Ajar & LKPD</li>
                 </ul>
-                <button onClick={() => { if (!currentUser) { window.location.href = '/login'; } else { switchTab('generator'); } }} className="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-3 rounded-xl transition-colors">Mulai Gratis</button>
+                {/* Cari tombol Mulai Gratis di kartu Rp 0 dan ubah kodenya menjadi seperti ini */}
+<button 
+  onClick={handleLoginGoogle} 
+  className="w-full py-3 px-4 bg-slate-800 hover:bg-slate-700 text-white rounded-xl font-bold transition-colors mt-6"
+>
+  Mulai Gratis
+</button>
               </div>
 
               <div className="bg-gradient-to-b from-surface to-amber-900/20 border-2 border-amber-500 rounded-3xl p-8 relative flex flex-col transform md:-translate-y-4">
