@@ -324,28 +324,20 @@ export default function ModulGenApp() {
     }
   };
 
-  const fetchAI = async (prompt: string, docType: string) => {
+ const fetchAI = async (prompt: string, docType: string) => {
     if (!currentUser || !currentUser.email) return showSystemModal("Validasi Gagal", "Silakan login terlebih dahulu!");
-    if (userQuota <= 0) return showSystemModal("Kuota Habis", "Kuota uji coba Anda telah habis. Silakan periksa paket langganan.");
+    if (userQuota <= 0) return showSystemModal("Kuota Habis", "Kuota Anda telah habis. Silakan berlangganan.");
     
     setGenState('C'); setIsGenerating(true); setActiveDocType(docType);
 
     try {
-      // 1. Kurangi kuota user dulu di Supabase
-      const sisaKuotaBaru = userQuota - 1;
-      const { error: updateError } = await supabase.from('users').update({ quota: sisaKuotaBaru }).eq('email', currentUser.email);
-      if (updateError) throw new Error("Gagal menghubungi database untuk sinkronisasi kuota.");
-
-      setUserQuota(sisaKuotaBaru);
-      localStorage.setItem('modulgen_dummy_user', JSON.stringify({ ...currentUser, quota: sisaKuotaBaru }));
-
-     // ... kode lainnya di dalam fetchAI
+      // Panggil API route di backend dan kirim prompt + email
       const response = await fetch('/api/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
-          prompt: prompt,            // <-- WAJIB begini, jangan pakai kalimatPromptLo
-          userId: currentUser.email  // <-- WAJIB begini, menyesuaikan state login lo
+          prompt: prompt,            // <-- Ini yang bikin hasil AI lo tepat sasaran
+          userId: currentUser.email  // <-- Sinkron dengan backend
         }),
       });
 
@@ -360,12 +352,14 @@ export default function ModulGenApp() {
 
       setResultHtml(cleanContent);
 
-      // 3. Simpan hasil ke brankas Supabase
-      const { error: insertError } = await supabase.from('documents').insert([
-          { user_email: currentUser.email, title: docType + " - " + new Date().toLocaleDateString('id-ID'), doc_type: docType, content: cleanContent }
-        ]);
+      // Sinkronisasi sisa kuota di layar (dikurangi 1) karena backend sudah memotongnya
+      const sisaKuotaBaru = userQuota - 1;
+      setUserQuota(sisaKuotaBaru);
 
-      if (insertError) console.error("Gagal menyimpan dokumen ke brankas:", insertError);
+      // Simpan hasil ke brankas Supabase
+      await supabase.from('documents').insert([
+          { user_email: currentUser.email, title: docType + " - " + new Date().toLocaleDateString('id-ID'), doc_type: docType, content: cleanContent }
+      ]);
 
     } catch (err: any) {
       showSystemModal("Peringatan Sistem", `Keterangan: ${err.message}`);
@@ -374,7 +368,6 @@ export default function ModulGenApp() {
       setIsGenerating(false);
     }
   };
-
   const handleGenerateModul = (e: React.FormEvent) => {
     e.preventDefault();
     if (selectedDPL.length === 0) return showSystemModal("Validasi Gagal", "Pilih minimal 1 Dimensi Profil Lulusan (DPL)!");
