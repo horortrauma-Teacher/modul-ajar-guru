@@ -339,14 +339,13 @@ export default function ModulGenApp() {
       setUserQuota(sisaKuotaBaru);
       localStorage.setItem('modulgen_dummy_user', JSON.stringify({ ...currentUser, quota: sisaKuotaBaru }));
 
-      // Contoh pemanggilan di frontend
-// Perbaikan pemanggilan API di frontend
+     // ... kode lainnya di dalam fetchAI
       const response = await fetch('/api/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
-          prompt: prompt,            // <-- Ambil dari parameter asli fungsi fetchAI
-          userId: currentUser.email  // <-- Pakai currentUser.email sesuai state login lo
+          prompt: prompt,            // <-- WAJIB begini, jangan pakai kalimatPromptLo
+          userId: currentUser.email  // <-- WAJIB begini, menyesuaikan state login lo
         }),
       });
 

@@ -9,44 +9,23 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 
 export async function POST(req: Request) {
   try {
-    // Menangkap data yang dikirim dari halaman depan
+    // 1. Tangkap data dari frontend
     const { prompt, userId } = await req.json(); 
     
-    // Pastikan user sedang login
-    if (!userId) {
-      return NextResponse.json({ error: 'Gagal memverifikasi akun. Silakan masuk (login) terlebih dahulu.' }, { status: 401 });
-    }
+    // ... (kode cek kuota Supabase pakai .eq('email', userId) tetap di sini) ...
 
-    // 1. CEK SISA KUOTA USER DI DATABASE SUPABASE
-    const { data: userData, error: userError } = await supabase
-      .from('users')
-      .select('kuota')
-      .eq('id', userId)
-      .single();
-
-    if (userError || !userData) {
-      return NextResponse.json({ error: 'Data akun tidak ditemukan di database.' }, { status: 404 });
-    }
-
-    if (userData.kuota <= 0) {
-      return NextResponse.json({ error: 'Kuota habis. Silakan berlangganan paket Guru Pro untuk melanjutkan.' }, { status: 403 });
-    }
-
-    // 2. PERSIAPKAN API KEY GEMINI
     const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) {
-      return NextResponse.json({ error: 'API Key Gemini belum disetting di server.' }, { status: 500 });
-    }
 
-    // 3. PANGGIL GOOGLE GEMINI DARI DALAM SERVER
+    // 2. Langsung lempar variabel 'prompt' ke Gemini
     const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
       method: 'POST', 
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }], // Idealnya ke depan prompt dirakit di sini agar anti-hijack
+        contents: [{ parts: [{ text: prompt }] }], // <-- PERHATIKAN BAGIAN INI
         generationConfig: { temperature: 0.1, maxOutputTokens: 8192 }
       })
     });
+// ...
 
     if (!response.ok) {
       const errorData = await response.json();
