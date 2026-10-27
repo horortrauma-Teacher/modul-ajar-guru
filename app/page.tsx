@@ -340,14 +340,15 @@ export default function ModulGenApp() {
       localStorage.setItem('modulgen_dummy_user', JSON.stringify({ ...currentUser, quota: sisaKuotaBaru }));
 
       // Contoh pemanggilan di frontend
-const response = await fetch('/api/generate', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ 
-    prompt: kalimatPromptLo, 
-    userId: user.id // <-- Pastikan ini dikirim!
-  }),
-});
+// Perbaikan pemanggilan API di frontend
+      const response = await fetch('/api/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          prompt: prompt,            // <-- Ambil dari parameter asli fungsi fetchAI
+          userId: currentUser.email  // <-- Pakai currentUser.email sesuai state login lo
+        }),
+      });
 
       if (!response.ok) {
         const errorData = await response.json();
