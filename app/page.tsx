@@ -339,12 +339,15 @@ export default function ModulGenApp() {
       setUserQuota(sisaKuotaBaru);
       localStorage.setItem('modulgen_dummy_user', JSON.stringify({ ...currentUser, quota: sisaKuotaBaru }));
 
-      // 2. Tembak ke API Route Backend kita yang aman
-      const response = await fetch('/api/generate', {
-        method: 'POST', 
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt })
-      });
+      // Contoh pemanggilan di frontend
+const response = await fetch('/api/generate', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ 
+    prompt: kalimatPromptLo, 
+    userId: user.id // <-- Pastikan ini dikirim!
+  }),
+});
 
       if (!response.ok) {
         const errorData = await response.json();
