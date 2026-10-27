@@ -9,10 +9,11 @@ export async function POST(req: Request) {
   try {
     // 1. Tangkap prompt dan userId (email)
     const { prompt, userId } = await req.json(); 
-    
+    console.log("CCTV BACKEND - User:", userId, "| Prompt:", prompt);
     if (!userId) {
       return NextResponse.json({ error: 'Gagal memverifikasi akun. Silakan login kembali.' }, { status: 401 });
     }
+    
 
     // 2. Cek sisa kuota 
     const { data: userData, error: userError } = await supabase
@@ -26,6 +27,9 @@ export async function POST(req: Request) {
     }
 
     const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      return NextResponse.json({ error: 'API Key Gemini belum disetting di server.' }, { status: 500 });
+    }
 
     // 3. Panggil Gemini HANYA menggunakan "prompt" asli dari frontend
     const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
