@@ -59,7 +59,7 @@ export async function POST(req: Request) {
     const { error: updateError } = await supabase
       .from('users')
       .update({ kuota: userData.kuota - 1 })
-      .eq('id', userId);
+     .eq('email', userId)
       
     if (updateError) {
       console.error("Peringatan: Gagal memotong kuota user di database:", updateError);
