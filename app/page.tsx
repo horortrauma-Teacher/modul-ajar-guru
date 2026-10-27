@@ -331,13 +331,13 @@ export default function ModulGenApp() {
     setGenState('C'); setIsGenerating(true); setActiveDocType(docType);
 
     try {
-      // Panggil API route di backend dan kirim prompt + email
+      // Panggil backend dengan variabel yang BENAR
       const response = await fetch('/api/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
-          prompt: prompt,            // <-- Ini yang bikin hasil AI lo tepat sasaran
-          userId: currentUser.email  // <-- Sinkron dengan backend
+          prompt: prompt,             // Pakai parameter dari fungsi
+          userId: currentUser.email   // Pakai email user yang lagi login
         }),
       });
 
@@ -347,16 +347,16 @@ export default function ModulGenApp() {
       }
 
       const data = await response.json();
-      const outputText = data.candidates[0].content.parts[0].text;
+      const outputText = data.candidates?.[0]?.content?.parts?.[0]?.text || "Maaf, AI gagal memproses.";
       const cleanContent = outputText.replace(/```html/gi, '').replace(/```/gi, '');
 
       setResultHtml(cleanContent);
 
-      // Sinkronisasi sisa kuota di layar (dikurangi 1) karena backend sudah memotongnya
+      // Kurangi kuota di tampilan layar
       const sisaKuotaBaru = userQuota - 1;
       setUserQuota(sisaKuotaBaru);
 
-      // Simpan hasil ke brankas Supabase
+      // Simpan riwayat ke Brankas Supabase
       await supabase.from('documents').insert([
           { user_email: currentUser.email, title: docType + " - " + new Date().toLocaleDateString('id-ID'), doc_type: docType, content: cleanContent }
       ]);
