@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import cpDatabase from './Data/capaian_pembelajaran.json';
 import { supabase } from "../lib/supabase";
 import Link from "next/link";
+import { getCbtTopicsForMapel } from "../lib/cbt-curriculum";
 
 export default function ModulGenApp() {
 
@@ -77,11 +78,12 @@ export default function ModulGenApp() {
   const [selectedContent, setSelectedContent] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
-    guru: '', sekolah: '', kepsek: '',
-    jenjang: '', kelas: '', fase: '', semester: '',
-    mapel: '', cp: '', tp: '', 
-    topik: '', karakteristik: '',
-    pertemuan: '', jp: '', model: ''
+    guru: 'Guru Pengampu CBT', sekolah: 'SMPS Daar El-Qolam', kepsek: 'Drs. H. Mahrus Amin',
+    jenjang: 'SMP/MTs', kelas: 'Kelas 7', fase: 'Fase D', semester: 'Semester 1 (Ganjil)',
+    mapel: 'Informatika', cp: 'Peserta didik mampu memahami, menganalisis, dan mengevaluasi konsep Membedakan Fakta dan Opini secara kritis di ruang siber.', 
+    tp: '1. Mengidentifikasi perbedaan fakta dan opini dalam teks berita digital.\n2. Menganalisis keabsahan sumber informasi dan mendeteksi disinformasi/hoaks.\n3. Mengaplikasikan etika bermedia digital dan berpikir kritis.', 
+    topik: 'Membedakan Fakta dan Opini', karakteristik: 'Peserta didik heterogen dengan minat tinggi terhadap literasi digital dan teknologi informasi.',
+    pertemuan: '2', jp: '2 JP (80 Menit)', model: 'Problem Based Learning (PBL)'
   });
 
   const getWaktu = () => {
@@ -97,16 +99,22 @@ export default function ModulGenApp() {
   const [resultHtml, setResultHtml] = useState("");
   const [activeDocType, setActiveDocType] = useState("Modul");
 
-  const [selectedDPL, setSelectedDPL] = useState<string[]>([]);
-  const [selectedMetode, setSelectedMetode] = useState<string[]>([]); 
+  const [selectedDPL, setSelectedDPL] = useState<string[]>(['Penalaran Kritis', 'Kemandirian']);
+  const [selectedMetode, setSelectedMetode] = useState<string[]>(['Diskusi Kelompok', 'Studi Kasus', 'Tanya Jawab']); 
   
-  const [lkpdData, setLkpdData] = useState({ jenjang: '', kelas: '', fase: '', mapel: '', topik: '', cp: '' });
+  const [lkpdData, setLkpdData] = useState({ 
+    jenjang: 'SMP/MTs', kelas: 'Kelas 7', fase: 'Fase D', 
+    mapel: 'Informatika', topik: 'Membedakan Fakta dan Opini', 
+    cp: 'Peserta didik mampu melakukan penyelidikan kolaboratif untuk membedakan fakta dan opini pada artikel daring serta memverifikasi data.' 
+  });
   
   const [ujianData, setUjianData] = useState({
-    jenjang: '', kelas: '', fase: '', semester: 'Semester 1',
-    mapel: '', indikator: '', topik: '',
-    tipeSoal: 'Soal Umum', jenisAsesmen: 'Pilihan Ganda',
-    jumlahOpsi: '5 Opsi (A, B, C, D, E)', tipePG: 'PG Tunggal (1 Benar)',
+    jenjang: 'SMP/MTs', kelas: 'Kelas 7', fase: 'Fase D', semester: 'Semester 1',
+    mapel: 'Informatika', 
+    indikator: 'Disajikan wacana berita digital, peserta didik dapat membedakan kalimat fakta dan opini serta mendeteksi potensi hoaks/disinformasi dengan penalaran kritis HOTS.', 
+    topik: 'Membedakan Fakta dan Opini',
+    tipeSoal: 'Soal Literasi', jenisAsesmen: 'Pilihan Ganda',
+    jumlahOpsi: '4 Opsi (A, B, C, D)', tipePG: 'PG Tunggal (1 Benar)',
     taksonomi: 'Taksonomi Bloom', kesulitan: 'Kombinasi (LOTS + MOTS + HOTS)',
     jumlahSoal: 5
   });
@@ -178,25 +186,83 @@ export default function ModulGenApp() {
     return dbSubjectKey ? faseData[dbSubjectKey] : [];
   };
 
-  const daftarTopikTersedia = getTopikByFaseAndMapel(formData.fase, formData.mapel);
+  // Helper penggabung Topik Standar CBT (SMPS Daar El-Qolam) + Elemen CP Resmi
+  const getCombinedTopikList = (mapel: string, fase: string) => {
+    const cbtTopics = getCbtTopicsForMapel(mapel);
+    const cpElements = getTopikByFaseAndMapel(fase, mapel);
+    return { cbtTopics, cpElements };
+  };
+
   const handleTopikChange = (e: any) => {
-    const selectedElemen = e.target.value;
-    const dataCpDitemukan = daftarTopikTersedia.find((item: any) => item.elemen === selectedElemen);
-    setFormData((prev: any) => ({ ...prev, topik: selectedElemen, cp: dataCpDitemukan ? dataCpDitemukan.deskripsi : '' }));
+    const val = e.target.value;
+    const { cbtTopics, cpElements } = getCombinedTopikList(formData.mapel, formData.fase);
+    
+    // 1. Cek apakah berasal dari katalog Topik CBT
+    const cbtFound = cbtTopics.find(t => t.nama === val);
+    if (cbtFound) {
+      setFormData((prev: any) => ({
+        ...prev,
+        topik: cbtFound.nama,
+        cp: `Peserta didik mampu memahami, menganalisis, dan mengevaluasi konsep ${cbtFound.nama} secara kritis dan kontekstual (${cbtFound.deskripsi}).`,
+        tp: `1. Mengidentifikasi konsep dan karakteristik ${cbtFound.nama}.\n2. Menganalisis ${cbtFound.deskripsi}.\n3. Mengaplikasikan pemikiran kritis dalam pemecahan masalah dunia nyata.`
+      }));
+      return;
+    }
+
+    // 2. Cek apakah elemen CP dari database
+    const cpFound = cpElements.find((item: any) => item.elemen === val);
+    if (cpFound) {
+      setFormData((prev: any) => ({ ...prev, topik: cpFound.elemen, cp: cpFound.deskripsi }));
+      return;
+    }
+
+    setFormData((prev: any) => ({ ...prev, topik: val }));
   };
 
-  const daftarTopikLkpd = getTopikByFaseAndMapel(lkpdData.fase, lkpdData.mapel);
   const handleTopikLkpdChange = (e: any) => {
-    const selectedElemen = e.target.value;
-    const dataCpDitemukan = daftarTopikLkpd.find((item: any) => item.elemen === selectedElemen);
-    setLkpdData((prev: any) => ({ ...prev, topik: selectedElemen, cp: dataCpDitemukan ? dataCpDitemukan.deskripsi : '' }));
+    const val = e.target.value;
+    const { cbtTopics, cpElements } = getCombinedTopikList(lkpdData.mapel, lkpdData.fase);
+    
+    const cbtFound = cbtTopics.find(t => t.nama === val);
+    if (cbtFound) {
+      setLkpdData((prev: any) => ({
+        ...prev,
+        topik: cbtFound.nama,
+        cp: `Peserta didik mampu melakukan penyelidikan kolaboratif untuk mengeksplorasi ${cbtFound.nama} (${cbtFound.deskripsi.toLowerCase()}) melalui aktivitas lembar kerja terstruktur.`
+      }));
+      return;
+    }
+
+    const cpFound = cpElements.find((item: any) => item.elemen === val);
+    if (cpFound) {
+      setLkpdData((prev: any) => ({ ...prev, topik: cpFound.elemen, cp: cpFound.deskripsi }));
+      return;
+    }
+
+    setLkpdData((prev: any) => ({ ...prev, topik: val }));
   };
 
-  const daftarTopikUjian = getTopikByFaseAndMapel(ujianData.fase, ujianData.mapel);
   const handleTopikUjianChange = (e: any) => {
-    const selectedElemen = e.target.value;
-    const dataCpDitemukan = daftarTopikUjian.find((item: any) => item.elemen === selectedElemen);
-    setUjianData((prev: any) => ({ ...prev, topik: selectedElemen, indikator: dataCpDitemukan ? dataCpDitemukan.deskripsi : '' }));
+    const val = e.target.value;
+    const { cbtTopics, cpElements } = getCombinedTopikList(ujianData.mapel, ujianData.fase);
+    
+    const cbtFound = cbtTopics.find(t => t.nama === val);
+    if (cbtFound) {
+      setUjianData((prev: any) => ({
+        ...prev,
+        topik: cbtFound.nama,
+        indikator: `Disajikan stimulus wacana atau kasus kontekstual tentang ${cbtFound.nama}, peserta didik dapat menganalisis ${cbtFound.deskripsi} dengan penalaran kritis tingkat tinggi (HOTS terstandar Asesmen CBT).`
+      }));
+      return;
+    }
+
+    const cpFound = cpElements.find((item: any) => item.elemen === val);
+    if (cpFound) {
+      setUjianData((prev: any) => ({ ...prev, topik: cpFound.elemen, indikator: cpFound.deskripsi }));
+      return;
+    }
+
+    setUjianData((prev: any) => ({ ...prev, topik: val }));
   };
 
   const openCpModal = (target: 'modul' | 'ujian') => {
@@ -252,20 +318,32 @@ export default function ModulGenApp() {
     setShowCpModal(false);
   };
 
-  // 1. Fungsi penarik kuota dari Database Supabase
+  // 1. Fungsi penarik kuota dari Database Supabase (dengan fallback aman)
   const fetchUserQuota = async (email: string) => {
-    const { data, error } = await supabase.from('users').select('quota').eq('email', email).single();
-    if (data) {
-      setUserQuota(data.quota);
-    } else {
-      // Jika user baru pertama kali login, buatkan data di tabel dan beri 10 kuota gratis
-      const { error: insertError } = await supabase.from('users').insert([{ email: email, quota: 10 }]);
-      if (!insertError) setUserQuota(10);
+    try {
+      const { data } = await supabase.from('users').select('quota').eq('email', email).single();
+      if (data && typeof data.quota === 'number') {
+        setUserQuota(data.quota);
+        return;
+      }
+      // Jika user baru pertama kali login, coba buatkan data di tabel dan beri 10 kuota gratis
+      const safeUid = email.replace(/[^a-zA-Z0-9]/g, '_');
+      const { error: insertError } = await supabase.from('users').insert([
+        { email: email, firebase_uid: safeUid, name: email.split('@')[0], quota: 10 }
+      ]);
+      if (!insertError) {
+        setUserQuota(10);
+        return;
+      }
+    } catch (e) {
+      console.warn("Sinkronisasi kuota Supabase dilewati (menggunakan kuota lokal):", e);
     }
+    setUserQuota((prev) => (prev > 0 ? prev : 10));
   };
 
-  // 2. Pendeteksi status Login Google (Otomatis jalan saat web dibuka)
+  // 2. Pendeteksi status Login (Mendukung Sesi Supabase OAuth & Sesi Login Lokal/Firebase)
   useEffect(() => {
+    // A. Cek sesi Supabase
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session?.user?.email) {
         setCurrentUser({ 
@@ -273,6 +351,24 @@ export default function ModulGenApp() {
           email: session.user.email 
         });
         fetchUserQuota(session.user.email);
+        return;
+      }
+
+      // B. Fallback: Cek sesi lokal dari halaman login (Firebase / Local Storage)
+      if (typeof window !== 'undefined') {
+        const dummyUserRaw = localStorage.getItem('modulgen_dummy_user');
+        if (dummyUserRaw) {
+          try {
+            const parsed = JSON.parse(dummyUserRaw);
+            if (parsed?.email) {
+              setCurrentUser({
+                name: parsed.name || parsed.email.split('@')[0],
+                email: parsed.email
+              });
+              setUserQuota(parsed.quota || 10);
+            }
+          } catch (e) {}
+        }
       }
     });
 
@@ -280,9 +376,6 @@ export default function ModulGenApp() {
       if (session?.user?.email) {
         setCurrentUser({ name: session.user.user_metadata.full_name || session.user.email.split('@')[0], email: session.user.email });
         fetchUserQuota(session.user.email);
-      } else {
-        setCurrentUser(null);
-        setUserQuota(0);
       }
     });
 
@@ -291,15 +384,17 @@ export default function ModulGenApp() {
 
   // 3. Tombol Eksekutor Google Login & Logout
   const handleLoginGoogle = async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: { redirectTo: window.location.origin }
-    });
-    if (error) showSystemModal("Gagal Login", error.message);
+    // Alihkan ke halaman /login yang menyediakan login Google
+    window.location.href = '/login';
   };
 
   const handleLogout = async () => {
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('modulgen_dummy_user');
+    }
     await supabase.auth.signOut();
+    setCurrentUser(null);
+    setUserQuota(0);
     switchTab('beranda');
   };
 
@@ -347,7 +442,7 @@ export default function ModulGenApp() {
       }
 
       const data = await response.json();
-      const outputText = data.candidates?.[0]?.content?.parts?.[0]?.text || "Maaf, AI gagal memproses.";
+      const outputText = data.candidates?.[0]?.content?.parts?.map((p: any) => p.text).filter(Boolean).join('') || data.candidates?.[0]?.content?.parts?.[0]?.text || "Maaf, AI gagal memproses.";
       const cleanContent = outputText.replace(/```html/gi, '').replace(/```/gi, '');
 
       setResultHtml(cleanContent);
@@ -356,10 +451,14 @@ export default function ModulGenApp() {
       const sisaKuotaBaru = userQuota - 1;
       setUserQuota(sisaKuotaBaru);
 
-      // Simpan riwayat ke Brankas Supabase
-      await supabase.from('documents').insert([
-          { user_email: currentUser.email, title: docType + " - " + new Date().toLocaleDateString('id-ID'), doc_type: docType, content: cleanContent }
-      ]);
+      // Simpan riwayat ke Brankas Supabase (dengan try-catch aman)
+      try {
+        await supabase.from('documents').insert([
+            { user_email: currentUser.email, title: docType + " - " + new Date().toLocaleDateString('id-ID'), doc_type: docType, content: cleanContent }
+        ]);
+      } catch (insertDocErr) {
+        console.warn("Gagal menyimpan dokumen ke Supabase (dilewati):", insertDocErr);
+      }
 
     } catch (err: any) {
       showSystemModal("Peringatan Sistem", `Keterangan: ${err.message}`);
@@ -532,9 +631,13 @@ DATA ASESMEN:
 - Topik: ${ujianData.topik}
 - Capaian/Indikator: ${ujianData.indikator}
 - Tipe Soal: ${ujianData.tipeSoal}
-- Jenis: ${ujianData.jenisAsesmen} ${ujianData.jenisAsesmen === 'Pilihan Ganda' ? `(${ujianData.jumlahOpsi}, ${ujianData.tipePG})` : ''}
+- Jenis: ${ujianData.jenisAsesmen} ${ujianData.jenisAsesmen.includes('Pilihan Ganda') ? `(${ujianData.jumlahOpsi}, ${ujianData.tipePG})` : ''}
 - Taksonomi / Kesulitan: ${ujianData.taksonomi} / ${ujianData.kesulitan}
 - Jumlah: ${ujianData.jumlahSoal} Butir Soal.
+INSTRUKSI KHUSUS BENTUK ASESMEN CBT:
+- Jika "Pilihan Ganda Kompleks": Sajikan format AKM dengan beberapa pernyataan benar/salah atau opsi lebih dari 1 yang benar.
+- Jika "Menjodohkan": Buat premis dan kolom pasangan respon yang tepat untuk dipasangkan.
+- Jika "Uraian (Essay)": Buat soal studi kasus/analisis disertai pedoman penskoran kriteria bertingkat.
 INSTRUKSI WAJIB: Buat soal HANYA berdasarkan Indikator di atas. DILARANG membuat soal umum/melenceng.
 ATURAN MUTLAK (ANTI-HALU & ANTI-LATEX):
 1. Output HANYA tag HTML (<div>, <table>, <ol>, <h3>, dll). Dilarang menyertakan teks sebelum/sesudah HTML.
@@ -614,7 +717,19 @@ STRUKTUR HTML YANG WAJIB DIIKUTI:
             ))}
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5">
+            {/* Jembatan ke Portal Ujian CBT SMP */}
+            <a
+              href="http://localhost:3000/guru"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white flex items-center gap-1.5 text-xs font-bold py-1.5 px-3 rounded-full border border-blue-400/80 shadow-xs transition-all whitespace-nowrap"
+              title="Buka Portal Ujian CBT SMP & Bank Soal AKM"
+            >
+              <span>🚀</span>
+              <span className="hidden sm:inline">Portal</span> CBT
+            </a>
+
             {!currentUser ? (
              <button onClick={handleLoginGoogle} className="bg-white text-gray-900 flex items-center gap-2 text-xs md:text-sm font-bold py-1.5 px-3 md:px-4 rounded-full border border-gray-200 shadow-sm hover:bg-slate-100 transition-colors">
                 <i className="fa-brands fa-google text-orange-500"></i> Masuk
@@ -822,12 +937,32 @@ STRUKTUR HTML YANG WAJIB DIIKUTI:
                         value={formData.topik}
                         onChange={handleTopikChange}
                       >
-                        <option value="" disabled>Pilih Topik / Elemen...</option>
-                        {daftarTopikTersedia.map((item: any, index: number) => (
-                          <option key={index} value={item.elemen}>
-                            {item.elemen}
-                          </option>
-                        ))}
+                        <option value="" disabled>Pilih Topik Pembelajaran...</option>
+                        {(() => {
+                          const { cbtTopics, cpElements } = getCombinedTopikList(formData.mapel, formData.fase);
+                          return (
+                            <>
+                              {cbtTopics.length > 0 && (
+                                <optgroup label="🌟 Topik Kurikulum CBT (SMPS Daar El-Qolam)">
+                                  {cbtTopics.map((item, idx) => (
+                                    <option key={`cbt-modul-${idx}`} value={item.nama}>
+                                      {item.nama}
+                                    </option>
+                                  ))}
+                                </optgroup>
+                              )}
+                              {cpElements.length > 0 && (
+                                <optgroup label="📚 Elemen Capaian Pembelajaran Resmi">
+                                  {cpElements.map((item: any, idx: number) => (
+                                    <option key={`cp-modul-${idx}`} value={item.elemen}>
+                                      {item.elemen}
+                                    </option>
+                                  ))}
+                                </optgroup>
+                              )}
+                            </>
+                          );
+                        })()}
                       </select>
                     </div>
 
@@ -954,8 +1089,32 @@ STRUKTUR HTML YANG WAJIB DIIKUTI:
                     <div>
                       <label className="text-xs text-slate-400">Topik Praktikum (Elemen CP) <span className="text-red-500">*</span></label>
                       <select required className="w-full bg-background border border-brand-500 text-white rounded-lg px-4 py-3 mt-1 outline-none ring-1 ring-brand-500 focus:border-brand-500" value={lkpdData.topik} onChange={handleTopikLkpdChange}>
-                        <option value="" disabled>Pilih Topik / Elemen...</option>
-                        {daftarTopikLkpd.map((item: any, index: number) => <option key={index} value={item.elemen}>{item.elemen}</option>)}
+                        <option value="" disabled>Pilih Topik Praktikum...</option>
+                        {(() => {
+                          const { cbtTopics, cpElements } = getCombinedTopikList(lkpdData.mapel, lkpdData.fase);
+                          return (
+                            <>
+                              {cbtTopics.length > 0 && (
+                                <optgroup label="🌟 Topik Praktikum Standar CBT">
+                                  {cbtTopics.map((item, idx) => (
+                                    <option key={`cbt-lkpd-${idx}`} value={item.nama}>
+                                      {item.nama}
+                                    </option>
+                                  ))}
+                                </optgroup>
+                              )}
+                              {cpElements.length > 0 && (
+                                <optgroup label="📚 Elemen Capaian Pembelajaran">
+                                  {cpElements.map((item: any, idx: number) => (
+                                    <option key={`cp-lkpd-${idx}`} value={item.elemen}>
+                                      {item.elemen}
+                                    </option>
+                                  ))}
+                                </optgroup>
+                              )}
+                            </>
+                          );
+                        })()}
                       </select>
                     </div>
                   </div>
@@ -1064,8 +1223,32 @@ STRUKTUR HTML YANG WAJIB DIIKUTI:
                     <div>
                       <label className="block text-xs font-semibold text-slate-400 mb-2">5. Topik Spesifik (Elemen CP) <span className="text-red-500">*</span></label>
                       <select required className="w-full bg-background border border-surface_border rounded-lg p-3 text-white outline-none focus:border-amber-500" value={ujianData.topik} onChange={handleTopikUjianChange}>
-                        <option value="" disabled>Pilih Topik / Elemen...</option>
-                        {daftarTopikUjian.map((item: any, index: number) => <option key={index} value={item.elemen}>{item.elemen}</option>)}
+                        <option value="" disabled>Pilih Topik Kisi-kisi Soal...</option>
+                        {(() => {
+                          const { cbtTopics, cpElements } = getCombinedTopikList(ujianData.mapel, ujianData.fase);
+                          return (
+                            <>
+                              {cbtTopics.length > 0 && (
+                                <optgroup label="🌟 Topik Kurikulum CBT (SMPS Daar El-Qolam)">
+                                  {cbtTopics.map((item, idx) => (
+                                    <option key={`cbt-ujian-${idx}`} value={item.nama}>
+                                      {item.nama}
+                                    </option>
+                                  ))}
+                                </optgroup>
+                              )}
+                              {cpElements.length > 0 && (
+                                <optgroup label="📚 Elemen Capaian Pembelajaran">
+                                  {cpElements.map((item: any, idx: number) => (
+                                    <option key={`cp-ujian-${idx}`} value={item.elemen}>
+                                      {item.elemen}
+                                    </option>
+                                  ))}
+                                </optgroup>
+                              )}
+                            </>
+                          );
+                        })()}
                       </select>
                     </div>
                   </div>
@@ -1084,20 +1267,22 @@ STRUKTUR HTML YANG WAJIB DIIKUTI:
                       <label className="block text-xs font-semibold text-slate-400 mb-3">7. Tipe Stimulus Soal <span className="text-red-500">*</span></label>
                       <select className="w-full bg-surface border border-surface_border rounded-lg p-3 text-white outline-none focus:border-amber-500" value={ujianData.tipeSoal} onChange={e => setUjianData({ ...ujianData, tipeSoal: e.target.value })}>
                         <option value="Soal Umum (Langsung)">Soal Umum (Kasus Singkat)</option>
-                        <option value="Soal Literasi">Soal Literasi (Teks Panjang/Data)</option>
+                        <option value="Soal Literasi">Soal Literasi (Teks Panjang/Data Kontekstual)</option>
                       </select>
                     </div>
                     <div>
                       <label className="block text-xs font-semibold text-slate-400 mb-3">8. Bentuk Asesmen <span className="text-red-500">*</span></label>
                       <select className="w-full bg-surface border border-surface_border rounded-lg p-3 text-white outline-none focus:border-amber-500" value={ujianData.jenisAsesmen} onChange={e => setUjianData({ ...ujianData, jenisAsesmen: e.target.value })}>
-                        <option value="Pilihan Ganda">Pilihan Ganda</option>
+                        <option value="Pilihan Ganda">Pilihan Ganda (Standar CBT)</option>
+                        <option value="Pilihan Ganda Kompleks">Pilihan Ganda Kompleks (AKM CBT)</option>
+                        <option value="Menjodohkan">Menjodohkan (Matching CBT)</option>
                         <option value="Isian Singkat">Isian Singkat</option>
-                        <option value="Uraian (Essay)">Uraian (Essay)</option>
+                        <option value="Uraian (Essay)">Uraian (Essay CBT)</option>
                       </select>
                     </div>
                   </div>
 
-                  {ujianData.jenisAsesmen === 'Pilihan Ganda' && (
+                  {(ujianData.jenisAsesmen === 'Pilihan Ganda' || ujianData.jenisAsesmen === 'Pilihan Ganda Kompleks') && (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-amber-500/10 border border-amber-500/20 rounded-lg animate-fade">
                       <div>
                         <label className="block text-[11px] font-semibold text-amber-200 mb-1">Jumlah Opsi <span className="text-red-500">*</span></label>
@@ -1165,6 +1350,7 @@ STRUKTUR HTML YANG WAJIB DIIKUTI:
                     <button onClick={() => setGenState('B')} className="px-4 py-2 border border-surface_border bg-background rounded-md text-slate-300 hover:text-white text-sm font-semibold"><i className="fa-solid fa-arrow-left mr-1"></i> Edit Form</button>
                     <button onClick={() => exportToWord('generatedContent')} className="px-4 py-2 bg-blue-500/20 text-blue-400 border border-blue-500/30 rounded-md hover:bg-blue-500/30 text-sm font-semibold"><i className="fa-solid fa-file-word mr-1"></i> Word</button>
                     <button onClick={() => exportToPDF('generatedContent')} className="px-4 py-2 bg-red-500/20 text-red-400 border border-red-500/30 rounded-md hover:bg-red-500/30 text-sm font-semibold"><i className="fa-solid fa-file-pdf mr-1"></i> PDF</button>
+                    <a href="http://localhost:3000/guru/bank-soal" target="_blank" rel="noopener noreferrer" className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-md text-sm font-semibold flex items-center gap-1 shadow-md transition-all"><i className="fa-solid fa-paper-plane mr-1"></i> Bank Soal CBT</a>
                   </div>
                 </div>
                 
