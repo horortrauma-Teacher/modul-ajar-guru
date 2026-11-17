@@ -740,11 +740,11 @@ STRUKTUR HTML YANG WAJIB DIIKUTI:
                   <span className={`w-2 h-2 rounded-full animate-pulse ${userQuota > 0 ? 'bg-green-400' : 'bg-red-400'}`}></span> Kuota: {userQuota}
                 </span>
                 <div className="relative group z-50">
-                  <button className="w-8 h-8 rounded-full bg-brand-500 text-white flex items-center justify-center font-bold text-sm cursor-pointer border-2 border-surface_border select-none focus:outline-none" tabIndex={0}>{currentUser.name.charAt(0)}</button>
+                  <button className="w-8 h-8 rounded-full bg-brand-500 text-white flex items-center justify-center font-bold text-sm cursor-pointer border-2 border-surface_border select-none focus:outline-none" tabIndex={0}>{(currentUser?.name || currentUser?.email || 'G').charAt(0).toUpperCase()}</button>
                   <div className="absolute right-0 mt-2 w-48 bg-surface border border-surface_border rounded-xl shadow-xl hidden group-hover:block group-focus-within:block z-50 overflow-hidden">
                     <div className="p-3 border-b border-surface_border bg-slate-800/50">
-                      <p className="text-sm text-white font-semibold truncate">{currentUser.name}</p>
-                      <p className="text-xs text-slate-400 truncate">{currentUser.email}</p>
+                      <p className="text-sm text-white font-semibold truncate">{currentUser?.name || currentUser?.email || 'Guru Hebat'}</p>
+                      <p className="text-xs text-slate-400 truncate">{currentUser?.email || '-'}</p>
                     </div>
                    <button onClick={handleLogout} className="w-full text-left flex items-center gap-2 px-4 py-3 text-sm text-red-400 hover:bg-surface_border transition-colors font-medium border-t border-surface_border">
                       <i className="fa-solid fa-arrow-right-from-bracket"></i> Keluar
@@ -767,7 +767,7 @@ STRUKTUR HTML YANG WAJIB DIIKUTI:
                   <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: 'radial-gradient(#ffffff 1.5px, transparent 1.5px)', backgroundSize: '24px 24px' }}></div>
                   <div className="relative z-10 mb-8 md:mb-0">
                     <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-2 tracking-tight">
-                      Selamat {getWaktu()}, {currentUser.name.split(' ')[0] || 'Guru Hebat'}
+                      Selamat {getWaktu()}, {(currentUser?.name || currentUser?.email || 'Guru Hebat').split(' ')[0]}
                     </h2>
                     <p className="text-emerald-100 text-base md:text-lg font-medium">
                       Mau menyiapkan perangkat ajar apa hari ini?
