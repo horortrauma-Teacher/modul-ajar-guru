@@ -5,6 +5,8 @@ import { supabase } from "../lib/supabase";
 import Link from "next/link";
 import { getCbtTopicsForMapel } from "../lib/cbt-curriculum";
 
+const CBT_URL = process.env.NEXT_PUBLIC_CBT_URL || 'https://heru89.vercel.app';
+
 export default function ModulGenApp() {
 
   // --- DATA REFERENSI ---
@@ -698,48 +700,48 @@ STRUKTUR HTML YANG WAJIB DIIKUTI:
   return (
     <div className="bg-background text-slate-200 font-sans antialiased min-h-screen selection:bg-brand-500/30 flex flex-col relative">
      <nav className="fixed top-0 left-0 right-0 z-40 bg-background/90 backdrop-blur-md border-b border-surface_border transition-all">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2 cursor-pointer" onClick={() => switchTab('beranda')}>
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2 cursor-pointer shrink-0" onClick={() => switchTab('beranda')}>
             <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 text-brand-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z" /><path d="M2 17l10 5 10-5" /><path d="M2 12l10 5 10-5" /></svg>
             <span className="text-white font-bold text-lg tracking-tight hidden sm:block">Modul Ajar Guru Hebat</span>
             <span className="bg-gradient-to-r from-accent-500 to-amber-500 text-[10px] font-bold px-1.5 py-0.5 rounded text-white uppercase tracking-wider ml-1 shadow-sm">PRO</span>
           </div>
 
-        <div className="flex items-center gap-3 md:gap-5 md:ml-6 overflow-x-auto whitespace-nowrap w-full pb-1 [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-slate-700 hover:[&::-webkit-scrollbar-thumb]:bg-slate-500 [&::-webkit-scrollbar-thumb]:rounded-full">
+        <div className="flex items-center gap-2 md:gap-4 overflow-x-auto whitespace-nowrap flex-1 min-w-0 pb-1 [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-slate-700 hover:[&::-webkit-scrollbar-thumb]:bg-slate-500 [&::-webkit-scrollbar-thumb]:rounded-full">
             {['beranda', 'generator', 'lkpd', 'soal', 'pricing', 'brankas', 'tentang kami', 'blog'].map((tab) => (
               <button
                 key={tab}
                 onClick={() => switchTab(tab)}
-                className={`h-full px-2 md:px-3 text-sm capitalize transition-colors whitespace-nowrap ${activeTab === tab ? 'text-white border-b-2 border-orange-500 font-bold' : 'text-slate-400 hover:text-white font-medium'}`}
+                className={`h-full px-2 md:px-3 text-sm capitalize transition-colors whitespace-nowrap shrink-0 ${activeTab === tab ? 'text-white border-b-2 border-orange-500 font-bold' : 'text-slate-400 hover:text-white font-medium'}`}
               >
                 {tab === 'generator' ? 'Modul Ajar' : tab === 'soal' ? 'Soal HOTS' : tab === 'pricing' ? 'Harga' : tab === 'lkpd' ? 'LKPD' : tab === 'brankas' ? 'Brankas' : tab === 'tentang kami' ? 'Tentang Kami' : tab}
               </button>
             ))}
           </div>
 
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
             {/* Jembatan ke Portal Ujian CBT SMP */}
             <a
-              href="http://localhost:3000/guru"
+              href={`${CBT_URL}/guru`}
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white flex items-center gap-1.5 text-xs font-bold py-1.5 px-3 rounded-full border border-blue-400/80 shadow-xs transition-all whitespace-nowrap"
-              title="Buka Portal Ujian CBT SMP & Bank Soal AKM"
+              className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-700 hover:to-indigo-700 text-white flex items-center gap-1.5 text-xs font-bold py-1.5 px-3 rounded-full border border-blue-400/80 shadow-md transition-all whitespace-nowrap shrink-0 hover:scale-105"
+              title="Buka Portal Ujian CBT SMP & Bank Soal AKM (heru89.vercel.app)"
             >
               <span>🚀</span>
-              <span className="hidden sm:inline">Portal</span> CBT
+              <span className="inline font-bold">Portal CBT</span>
             </a>
 
             {!currentUser ? (
-             <button onClick={handleLoginGoogle} className="bg-white text-gray-900 flex items-center gap-2 text-xs md:text-sm font-bold py-1.5 px-3 md:px-4 rounded-full border border-gray-200 shadow-sm hover:bg-slate-100 transition-colors">
+             <button onClick={handleLoginGoogle} className="bg-white text-gray-900 flex items-center gap-2 text-xs md:text-sm font-bold py-1.5 px-3 md:px-4 rounded-full border border-gray-200 shadow-sm hover:bg-slate-100 transition-colors shrink-0">
                 <i className="fa-brands fa-google text-orange-500"></i> Masuk
               </button>
             ) : (
-              <div className="flex items-center gap-3">
-                <span className="text-[11px] font-bold text-slate-300 hidden md:flex items-center gap-1.5 bg-surface px-3 py-1.5 rounded-full border border-surface_border shadow-inner">
+              <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+                <span className="text-[11px] font-bold text-slate-300 hidden md:flex items-center gap-1.5 bg-surface px-3 py-1.5 rounded-full border border-surface_border shadow-inner shrink-0">
                   <span className={`w-2 h-2 rounded-full animate-pulse ${userQuota > 0 ? 'bg-green-400' : 'bg-red-400'}`}></span> Kuota: {userQuota}
                 </span>
-                <div className="relative group z-50">
+                <div className="relative group z-50 shrink-0">
                   <button className="w-8 h-8 rounded-full bg-brand-500 text-white flex items-center justify-center font-bold text-sm cursor-pointer border-2 border-surface_border select-none focus:outline-none" tabIndex={0}>{(currentUser?.name || currentUser?.email || 'G').charAt(0).toUpperCase()}</button>
                   <div className="absolute right-0 mt-2 w-48 bg-surface border border-surface_border rounded-xl shadow-xl hidden group-hover:block group-focus-within:block z-50 overflow-hidden">
                     <div className="p-3 border-b border-surface_border bg-slate-800/50">
@@ -787,24 +789,44 @@ STRUKTUR HTML YANG WAJIB DIIKUTI:
 
                 <div className="mb-10">
                   <h3 className="text-xl font-bold text-white mb-6">Bahan Ajar & Materi</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                     {[
-                      { id: 'generator', title: 'Modul Ajar', desc: 'Modul ajar lengkap sesuai Kurikulum Merdeka.', icon: 'fa-book-open', iconColor: 'text-blue-600', bg: 'bg-[#bae6fd]', badge: 'Populer', badgeColor: 'bg-[#fbbd23]' },
-                      { id: 'lkpd', title: 'LKPD', desc: 'Lembar Kerja Peserta Didik yang runtut.', icon: 'fa-file-lines', iconColor: 'text-amber-600', bg: 'bg-[#fef08a]' },
-                      { id: 'soal', title: 'Bank Soal', desc: 'Soal pilihan ganda dan uraian lengkap.', icon: 'fa-file-circle-check', iconColor: 'text-emerald-600', bg: 'bg-[#bbf7d0]' }
+                      { id: 'generator', title: 'Modul Ajar', desc: 'Modul ajar lengkap sesuai Kurikulum Merdeka.', icon: 'fa-book-open', iconColor: 'text-blue-600', bg: 'bg-[#bae6fd]', badge: 'Populer', badgeColor: 'bg-[#fbbd23]', isExternal: false },
+                      { id: 'lkpd', title: 'LKPD', desc: 'Lembar Kerja Peserta Didik yang runtut.', icon: 'fa-file-lines', iconColor: 'text-amber-600', bg: 'bg-[#fef08a]', isExternal: false },
+                      { id: 'soal', title: 'Bank Soal HOTS', desc: 'Generate butir soal AKM, PG, PGK & Uraian.', icon: 'fa-file-circle-check', iconColor: 'text-emerald-600', bg: 'bg-[#bbf7d0]', isExternal: false },
+                      { id: 'cbt', title: 'Portal CBT Siswa', desc: 'Ujian online, rilis token sesi CBT & rekap nilai.', icon: 'fa-laptop-code', iconColor: 'text-indigo-600', bg: 'bg-[#c7d2fe]', badge: 'Live CBT', badgeColor: 'bg-[#a5b4fc]', isExternal: true, href: `${CBT_URL}/guru` }
                     ].map((item) => (
-                      <div key={item.id} onClick={() => switchTab(item.id)} className={`${item.bg} p-6 rounded-2xl border-2 border-slate-900 shadow-[4px_4px_0px_rgba(0,0,0,1)] hover:-translate-y-1 transition-all cursor-pointer flex flex-col group`}>
-                        <div className="flex justify-between items-start mb-4">
-                          <div className="w-10 h-10 bg-white border-2 border-slate-900 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                            <i className={`fa-solid ${item.icon} ${item.iconColor} text-lg`}></i>
+                      item.isExternal ? (
+                        <a
+                          key={item.id}
+                          href={item.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className={`${item.bg} p-6 rounded-2xl border-2 border-slate-900 shadow-[4px_4px_0px_rgba(0,0,0,1)] hover:-translate-y-1 transition-all cursor-pointer flex flex-col group`}
+                        >
+                          <div className="flex justify-between items-start mb-4">
+                            <div className="w-10 h-10 bg-white border-2 border-slate-900 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                              <i className={`fa-solid ${item.icon} ${item.iconColor} text-lg`}></i>
+                            </div>
+                            {item.badge && <span className={`text-xs font-bold px-3 py-1 rounded-full border-2 border-slate-900 text-slate-900 ${item.badgeColor}`}>{item.badge}</span>}
                           </div>
-                          {item.badge && <span className={`text-xs font-bold px-3 py-1 rounded-full border-2 border-slate-900 text-slate-900 ${item.badgeColor}`}>{item.badge}</span>}
+                          <h4 className="font-bold text-slate-900 text-lg mb-2">{item.title}</h4>
+                          <p className="text-slate-700 text-sm mb-6 flex-grow leading-relaxed">{item.desc}</p>
+                          <div className="text-sm font-bold text-slate-900 flex items-center gap-2">Buka CBT <i className="fa-solid fa-arrow-up-right-from-square group-hover:translate-x-1 transition-transform"></i></div>
+                        </a>
+                      ) : (
+                        <div key={item.id} onClick={() => switchTab(item.id)} className={`${item.bg} p-6 rounded-2xl border-2 border-slate-900 shadow-[4px_4px_0px_rgba(0,0,0,1)] hover:-translate-y-1 transition-all cursor-pointer flex flex-col group`}>
+                          <div className="flex justify-between items-start mb-4">
+                            <div className="w-10 h-10 bg-white border-2 border-slate-900 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                              <i className={`fa-solid ${item.icon} ${item.iconColor} text-lg`}></i>
+                            </div>
+                            {item.badge && <span className={`text-xs font-bold px-3 py-1 rounded-full border-2 border-slate-900 text-slate-900 ${item.badgeColor}`}>{item.badge}</span>}
+                          </div>
+                          <h4 className="font-bold text-slate-900 text-lg mb-2">{item.title}</h4>
+                          <p className="text-slate-700 text-sm mb-6 flex-grow leading-relaxed">{item.desc}</p>
+                          <div className="text-sm font-bold text-slate-900 flex items-center gap-2">Buka <i className="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i></div>
                         </div>
-                        <h4 className="font-bold text-slate-900 text-lg mb-2">{item.title}</h4>
-                        <p className="text-slate-700 text-sm mb-6 flex-grow leading-relaxed">{item.desc}</p>
-                        <div className="text-sm font-bold text-slate-900 flex items-center gap-2">Buka <i className="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i></div>
-                      </div>
-                      
+                      )
                     ))}
                   </div>
                 </div>
@@ -1350,7 +1372,7 @@ STRUKTUR HTML YANG WAJIB DIIKUTI:
                     <button onClick={() => setGenState('B')} className="px-4 py-2 border border-surface_border bg-background rounded-md text-slate-300 hover:text-white text-sm font-semibold"><i className="fa-solid fa-arrow-left mr-1"></i> Edit Form</button>
                     <button onClick={() => exportToWord('generatedContent')} className="px-4 py-2 bg-blue-500/20 text-blue-400 border border-blue-500/30 rounded-md hover:bg-blue-500/30 text-sm font-semibold"><i className="fa-solid fa-file-word mr-1"></i> Word</button>
                     <button onClick={() => exportToPDF('generatedContent')} className="px-4 py-2 bg-red-500/20 text-red-400 border border-red-500/30 rounded-md hover:bg-red-500/30 text-sm font-semibold"><i className="fa-solid fa-file-pdf mr-1"></i> PDF</button>
-                    <a href="http://localhost:3000/guru/bank-soal" target="_blank" rel="noopener noreferrer" className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-md text-sm font-semibold flex items-center gap-1 shadow-md transition-all"><i className="fa-solid fa-paper-plane mr-1"></i> Bank Soal CBT</a>
+                    <a href={`${CBT_URL}/guru/bank-soal`} target="_blank" rel="noopener noreferrer" className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-md text-sm font-semibold flex items-center gap-1 shadow-md transition-all"><i className="fa-solid fa-paper-plane mr-1"></i> Bank Soal CBT</a>
                   </div>
                 </div>
                 
